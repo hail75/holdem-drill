@@ -188,8 +188,8 @@ gen("River vs big bets", null, 600, g => {
 });
 
 // 10. The version shown in the app must match the service worker cache
-const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-(\d+\.\d+)"/);
-const appv = html.match(/var BUILD=\{v:"(\d+\.\d+)",at:"(\d{4}-\d\d-\d\dT\d\d:\d\dZ)"/);
+const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-(\d+\.\d+\.\d+)"/);
+const appv = html.match(/var BUILD=\{v:"(\d+\.\d+\.\d+)",at:"(\d{4}-\d\d-\d\dT\d\d:\d\dZ)"/);
 ok(swv && appv && swv[1] === appv[1], `version in index.html (${appv && appv[1]}) must match the cache name in sw.js (${swv && swv[1]})`);
 
 console.log(fails ? `${fails} failure(s)` : "All checks passed");
