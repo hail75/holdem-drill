@@ -158,5 +158,10 @@ for (const k in X.G) for (const f of X.G[k].fmts || [null]) {
   ok(found >= tries * .95, `${k} (${f}): only ${found} of ${tries} skills could be asked again`);
 }
 
+// 10. The version shown in the app must match the service worker cache
+const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-v(\d+)/)[1];
+const appv = html.match(/var BUILD=\{v:(\d+)/)[1];
+ok(swv === appv, `version in index.html (${appv}) must match the cache name in sw.js (v${swv})`);
+
 console.log(fails ? `${fails} failure(s)` : "All checks passed");
 process.exit(fails ? 1 : 0);

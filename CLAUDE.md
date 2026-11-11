@@ -4,7 +4,7 @@ A mobile-first practice app for **live No-Limit Hold'em cash games, heads-up to 
 
 ## Files
 - `index.html`: the entire app (HTML, CSS and JS in one file, no build step, no dependencies).
-- `manifest.webmanifest`, `sw.js`, `icon-*.png`, `apple-touch-icon.png`: installable PWA with offline support. **Bump the cache name in `sw.js` (`holdem-drill-vN`) on every release.**
+- `manifest.webmanifest`, `sw.js`, `icon-*.png`, `apple-touch-icon.png`: installable PWA with offline support. **Bump the cache name in `sw.js` (`holdem-drill-vN`) on every release, and set `BUILD` in `index.html` to the same N and today’s date.** The page footer and the menu show "Version N · built date", so you can tell when a deploy has loaded. The tests check the numbers match.
 - `icon.svg`: the one source for the logo. The header logo inlines it, and every PNG icon is rendered from it (maskable and apple-touch versions without the rounded corners). Change the logo there, then re-render the PNGs.
 - `tests/verify.mjs`: strategy and integrity checks. **Run `node tests/verify.mjs` after every change. It must print "All checks passed".**
 - Hosted on GitHub Pages from `main`, at the repo root.
