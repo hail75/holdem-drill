@@ -115,6 +115,9 @@ gen("River vs big bets", null, 4000, g => {
   const c = right(g).map(t => t.split(" ")[0]).join();
   if (g.kind === "top") ok(c === (g.vil === "solid" ? "Fold" : "Call"), "top pair: fold to a solid three-street bettor, call a bluffer or a small bet");
   if (g.kind === "two") ok(c === (g.vil === "solid" ? "Call" : "Call,Raise"), "top two pair: call a solid player, call or raise the others");
+  const rz = g.o.find(o => /^Raise/.test(o.t));
+  ok(rz && /^Raise (to \d+|all-in \(\d+\))$/.test(rz.t), "river: the raise option must say how much");
+  if (rz && rz.ok) ok(/times their bet|all-in for your last/.test(g.e), "river: a correct raise must explain its size");
   if (g.kind === "set") ok(c === (g.sp && g.vil === "solid" ? "Call" : g.sp ? "Call,Raise" : "Raise"), "set: raise, but only call a solid player when a straight is possible");
 });
 
