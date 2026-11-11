@@ -159,9 +159,9 @@ for (const k in X.G) for (const f of X.G[k].fmts || [null]) {
 }
 
 // 10. The version shown in the app must match the service worker cache
-const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-v(\d+)/)[1];
-const appv = html.match(/var BUILD=\{v:(\d+)/)[1];
-ok(swv === appv, `version in index.html (${appv}) must match the cache name in sw.js (v${swv})`);
+const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-(\d+\.\d+)"/);
+const appv = html.match(/var BUILD=\{v:"(\d+\.\d+)",at:"(\d{4}-\d\d-\d\dT\d\d:\d\dZ)"/);
+ok(swv && appv && swv[1] === appv[1], `version in index.html (${appv && appv[1]}) must match the cache name in sw.js (${swv && swv[1]})`);
 
 console.log(fails ? `${fails} failure(s)` : "All checks passed");
 process.exit(fails ? 1 : 0);
