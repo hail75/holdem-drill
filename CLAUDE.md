@@ -102,6 +102,7 @@ Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3
 - Explanations once praised a hand while telling you to fold it ("A strong ace makes top pair..." on a fold). `handNote` now takes `play`.
 - Adaptation once said "the blinds" when only the big blind was left, and called TT-JJ/AQ "a fold against a normal 3-bet".
 - Reviews once replayed a spot saved before the table-size context was added, so “what share does the cutoff open” showed with no table size.
+- River explanations once said “a straight is possible” without naming it, and a wheel (52 on A-4-3) looked like a mistake. `strNames` now names every straight.
 - Seat text once said "about 36%" for the cutoff while the chart was 35%. Text now reads the chart.
 
 ## Conventions
