@@ -13,3 +13,7 @@ You get the gold ♣ icon, a full-screen app without the browser bar, and it wor
 ## Notes
 - Stats are saved per web address, so this app starts with fresh stats (separate from the claude.ai link).
 - To update: replace `index.html` with a newer version and commit. The app picks it up the next time it opens online.
+
+## Working with Claude Code
+- `CLAUDE.md` gives Claude Code the full context: code map, strategy rules, past mistakes, and conventions.
+- `tests/verify.mjs` checks the strategy logic. Run `node tests/verify.mjs` after any change.
