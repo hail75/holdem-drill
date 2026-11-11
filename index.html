@@ -361,8 +361,10 @@ function randNear(ch,filter){
   if(Math.random()<.5)for(var i=0;i<150;i++){var c=dealFrom(2,[]),h=hc(c[0],c[1]);if(isEdge(ch,h)&&(!filter||filter(h)))return {cards:c,h:h};}
   return randHand([],filter);
 }
-/* For spots where most hands fold: lean toward hands inside or next to the range, so most spots are real decisions. */
+/* For spots where most hands fold: about half the time deal an edge hand (KTs vs K9s, AJo vs ATo),
+   otherwise lean toward hands inside or next to the range, so most spots are real decisions. */
 function randPlay(ch){
+  if(Math.random()<.5)for(var j=0;j<300;j++){var c0=dealFrom(2,[]),h0=hc(c0[0],c0[1]);if(isEdge(ch,h0))return {cards:c0,h:h0};}
   if(Math.random()<.65)for(var i=0;i<200;i++){var c=dealFrom(2,[]),h=hc(c[0],c[1]);if(inCh(ch,h)||isEdge(ch,h))return {cards:c,h:h};}
   return randHand([]);
 }
