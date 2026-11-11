@@ -21,6 +21,7 @@ A mobile-first practice app for **live No-Limit Hold'em cash games, heads-up to 
 9. **UI and state** (after `/* ===== State`): localStorage key `endlessHoldemDrill.v2`. Table size is a range `st.lo`..`st.hi` set by a two-handle slider (either handle can be either end). Theme switch (`st.theme`: dark, light, or auto) sets `data-theme` on `<html>`, and a MutationObserver re-applies it if the host changes it.
 10. **Smart mode** (how the app helps you remember):
    - **Review ladder** (`st.rev`, keyed by skill, `LADDER`): a miss puts the skill in box 0 and the exact spot returns 3-4 spots later. Each right answer moves it up: box 1 after ~10 spots and box 2 after ~25 spots (both with new cards), then 1, 3 and 7 days. Right at the last box = mastered (`st.mastered`). A miss at any box sends it back to box 0. This is successive relearning (Rawson & Dunlosky): retrieve until right, then relearn at growing gaps.
+   - Each queued skill stores the version that saved it (`ver`). A box-0 spot saved by an older version is dealt fresh instead of replayed, so old wording never comes back. `variant` falls back to a fresh copy of the same question when a skill has only one spot.
    - Reviews show up as "second try" (box 0) or "review" and are never served twice in a row unless 4+ are due, so new spots stay mixed in (interleaving). The feedback says when the skill comes back.
    - Topic mix: `weighted()` uses `st.ew`, a recent error rate per topic (each answer counts 20%), not lifetime accuracy.
    - Random mode turns all of this off.
@@ -97,6 +98,7 @@ Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3
 - The flop all-in draw spot once offered "Raise all-in" against a player who was already all-in.
 - Explanations once praised a hand while telling you to fold it ("A strong ace makes top pair..." on a fold). `handNote` now takes `play`.
 - Adaptation once said "the blinds" when only the big blind was left, and called TT-JJ/AQ "a fold against a normal 3-bet".
+- Reviews once replayed a spot saved before the table-size context was added, so “what share does the cutoff open” showed with no table size.
 - Seat text once said "about 36%" for the cutoff while the chart was 35%. Text now reads the chart.
 
 ## Conventions

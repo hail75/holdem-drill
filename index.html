@@ -1023,17 +1023,20 @@ function skillOf(g){
   if(g.rkey)return g.topic+"|"+g.rkey;
   return g.topic+"|"+(g.you||g.tag||"")+"|"+g.o.filter(function(o){return o.ok;}).map(function(o){return o.t.split(" ")[0];}).join("/");
 }
+/* Prefers a spot that differs from the last one (avoid = its explanation). Some skills only have one spot,
+   like "what share does the cutoff open", so a fresh copy of the same question is the fallback. */
 function variant(topic,f,skill,avoid){
+  var same=null;
   for(var i=0;i<2000;i++){var g=G[topic].gen(f);if(!g)continue;g.topic=topic;g.fm=f;
-    if(skillOf(g)===skill&&(!avoid||g.e!==avoid))return g;}
-  return null;
+    if(skillOf(g)!==skill)continue;if(!avoid||g.e!==avoid)return g;if(!same)same=g;}
+  return same;
 }
 
 /* ===================== State ===================== */
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-1.N); the tests check it. Bump the second number every
    release. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"1.13",at:"2026-11-11T09:56Z"};
+var BUILD={v:"1.14",at:"2026-11-11T10:20Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1117,7 +1120,7 @@ function schedule(x){var L=LADDER[x.box];x.due=L.n!==undefined?st.n+L.n+rnd(2):D
 function plain(g){var c={};Object.keys(g).forEach(function(k){if(k!=="peeked"&&k!=="rv")c[k]=g[k];});return c;}
 /* Missed: start the skill at box 0 with this exact spot. */
 function missed(g){
-  var k=skillOf(g),x={box:0,g:plain(g),f:g.fm===undefined?(g.f||null):g.fm};schedule(x);st.rev[k]=x;
+  var k=skillOf(g),x={box:0,g:plain(g),ver:BUILD.v,f:g.fm===undefined?(g.f||null):g.fm};schedule(x);st.rev[k]=x;
   var ks=Object.keys(st.rev);if(ks.length>40){ks.sort(function(a,b){return st.rev[b].box-st.rev[a].box;});delete st.rev[ks[0]];}
 }
 /* Answered a review: climb the ladder, or start again. Returns where the skill went, for the feedback line. */
@@ -1126,7 +1129,7 @@ function reviewed(g,ok){
   if(!ok){missed(g);return "This one comes back in a few spots.";}
   x.box++;
   if(x.box>=LADDER.length){delete st.rev[k];st.mastered++;return "Mastered. This skill is off your review list.";}
-  x.g=plain(g);schedule(x);var L=LADDER[x.box];
+  x.g=plain(g);x.ver=BUILD.v;schedule(x);var L=LADDER[x.box];
   return "Next review: "+(L.n!==undefined?"in about "+L.n+" spots, with new cards.":L.h<24?"tomorrow.":"in "+Math.round(L.h/24)+" days.");
 }
 function usable(x){return st.on[x.g.topic]&&available(x.g.topic)&&(x.f===null||inRange(x.f));}
@@ -1141,7 +1144,9 @@ function next(){
     if(due.length&&(!lastRev||due.length>=4)){
       var k=due[0],x=st.rev[k];
       var vf=x.f===null&&G[x.g.topic].fmts?pick(G[x.g.topic].fmts.filter(inRange)):x.f;
-      g=x.box===0?JSON.parse(JSON.stringify(x.g)):(variant(x.g.topic,vf,k,x.g.e)||JSON.parse(JSON.stringify(x.g)));
+      /* Box 0 shows the exact spot again, but only if it was saved by this version: a spot saved by an older
+         version can carry old wording (a question that once left out the table size), so deal it fresh. */
+      g=x.box===0&&x.ver===BUILD.v?JSON.parse(JSON.stringify(x.g)):(variant(x.g.topic,vf,k,x.box===0?null:x.g.e)||JSON.parse(JSON.stringify(x.g)));
       g.rv=k;g.box=x.box;
     }
   }
