@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnNote,drillSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnNote,drillSpot,RAISE_GUIDE,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -186,6 +186,15 @@ gen("River vs big bets", null, 600, g => {
   ok(any, "river: a board flagged as having a straight must have one");
   if (/straight/.test(g.e)) ok(/makes/.test(g.e), "river: an explanation that mentions a straight must name it");
 });
+
+// 13. Raising guide: every card drills a real topic and has rows and a reason
+for (const x of X.RAISE_GUIDE) ok(X.G[x.drill] && x.rows.length >= 2 && x.rows.every(r => r.length === 2 && r[0] && r[1]) && x.why.length > 60, `raising guide: "${x.t}" is incomplete`);
+// ...and its numbers match what the generators grade
+const gtxt = JSON.stringify(X.RAISE_GUIDE);
+gen("Preflop opens", "4", 200, g => ok(g.o.some(o => o.t === (g.you === "SB" ? "Raise to 6" : "Raise to 5")) && /Raise to 5 \(2\.5/.test(gtxt) && /Raise to 6 \(3/.test(gtxt), "raising guide: opening sizes"));
+gen("Facing a raise", "6", 200, g => ok(g.o[0].t === (g.you === "SB" ? "Re-raise to 18" : "Re-raise to 15") && /Re-raise to 15/.test(gtxt) && /Re-raise to 18/.test(gtxt), "raising guide: re-raise sizes"));
+gen("Big blind defense", "4", 200, g => { if (Object.keys(g.sub)[0] !== "SB") ok(g.o[0].t === "Re-raise to 16" && /Re-raise to 16/.test(gtxt), "raising guide: big blind re-raise size"); });
+for (const [k, pct] of [["PUSHEP", 11], ["PUSHMID", 15], ["PUSHCO", 21], ["PUSHBTN", 38], ["PUSHHU", 58]]) ok(X.chartPct(X.CH[k]) === pct && gtxt.includes("About " + pct + "%"), `raising guide: shove share for ${k}`);
 
 // 10. The version shown in the app must match the service worker cache
 const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-(\d+\.\d+\.\d+)"/);
