@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,skillOf,variant,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,skillOf,variant,learnGroups,learnNote,drillSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -157,6 +157,15 @@ for (const k in X.G) for (const f of X.G[k].fmts || [null]) {
   }
   ok(found >= tries * .95, `${k} (${f}): only ${found} of ${tries} skills could be asked again`);
 }
+
+// 11. Learn ranges: every chart listed for a table size exists there and can be drilled
+for (const f of X.FMTS) for (const gr of X.learnGroups(f)) for (const k of gr.keys) {
+  ok(X.RSPEC[k] && !/undefined|NaN/.test(X.learnNote(k) + X.rangeText(k)), `learn: ${k} at ${f}-handed has broken text`);
+  const g = X.drillSpot(k, f);
+  ok(g && g.rkey === k, `learn: cannot drill ${k} at ${f}-handed`);
+  if (g && g.f) ok(g.f === f, `learn: drill for ${k} dealt the wrong table size`);
+}
+ok(X.learnGroups("4")[0].keys.join() === "CO,BTN,SB" && X.learnGroups("2")[0].keys.join() === "BTNHU", "learn: opening charts per table size");
 
 // 10. The version shown in the app must match the service worker cache
 const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-(\d+\.\d+)"/);
