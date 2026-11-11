@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,skillOf,variant,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -145,6 +145,18 @@ ok(E.std.QQ > 53 && E.std.TT < 45 && E.std.AQs < 45, "vs a typical shove: call Q
 for (const f of ["2", "5", "9"]) gen("All-in decisions", f, 400, g => {
   if (g.who) ok(/^Call/.test(right(g).join()) === (E[g.who][g.label] > 49), "calling a shove: answer must follow the equity table");
 });
+
+// 9. Reviews: every skill can be asked again with new cards, quickly
+for (const k in X.G) for (const f of X.G[k].fmts || [null]) {
+  let found = 0, tries = 0;
+  for (let i = 0; i < 25; i++) {
+    const g = X.G[k].gen(f); if (!g) continue; g.topic = k; tries++;
+    const t0 = Date.now(), v = X.variant(k, f, X.skillOf(g)), ms = Date.now() - t0;
+    if (v) { found++; ok(X.skillOf(v) === X.skillOf(g), `${k}: variant has a different skill`); }
+    ok(ms < 400, `${k} (${f}): finding a variant took ${ms} ms`);
+  }
+  ok(found >= tries * .95, `${k} (${f}): only ${found} of ${tries} skills could be asked again`);
+}
 
 console.log(fails ? `${fails} failure(s)` : "All checks passed");
 process.exit(fails ? 1 : 0);
