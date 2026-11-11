@@ -1046,6 +1046,8 @@ st.mastered=st.mastered||0;
 /* Recent error rate per topic: each answer counts 20%, so the topic mix follows how you play now, not months ago. */
 st.ew=st.ew||{};TOPICS.forEach(function(t){if(st.ew[t]===undefined){var b=st.by[t];st.ew[t]=(b[1]-b[0]+1)/(b[1]+2);}});
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+/* Ask the browser to keep this data instead of clearing it when space runs low or the app goes unused. Harmless if refused. */
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});}catch(e){}
 var cur=null,picked=null,lastRev=false;
 
 /* ===================== Rendering helpers ===================== */
