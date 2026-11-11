@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,skillOf,variant,learnGroups,learnNote,drillSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnNote,drillSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -166,6 +166,23 @@ for (const f of X.FMTS) for (const gr of X.learnGroups(f)) for (const k of gr.ke
   if (g && g.f) ok(g.f === f, `learn: drill for ${k} dealt the wrong table size`);
 }
 ok(X.learnGroups("4")[0].keys.join() === "CO,BTN,SB" && X.learnGroups("2")[0].keys.join() === "BTNHU", "learn: opening charts per table size");
+
+// 12. River explanations name the straight: every listed straight is real, and none is missed
+const P2 = s => X.parse(s);
+ok(X.strNames(P2("8♥ 3♣ T♦ A♦ 4♠")) === "52 makes A-2-3-4-5", "straight names: the wheel on 8-3-T-A-4");
+ok(X.strNames(P2("9♥ 8♣ 7♦ 2♦ 2♠")).startsWith("JT makes 7-8-9-T-J"), "straight names: highest first");
+gen("River vs big bets", null, 600, g => {
+  if (!g.sp) return;
+  const used = new Set(g.board.map(c => c.v + "_" + c.s));
+  const free = v => [0, 1, 2, 3].filter(s => !used.has(v + "_" + s));
+  let any = false;
+  for (let a = 2; a <= 14 && !any; a++) for (let b = 2; b <= a && !any; b++) {
+    const sa = free(a), sb = free(b).filter(s => a !== b || s !== sa[0]);
+    if (sa.length && sb.length && X.best(g.board.concat([{ v: a, s: sa[0] }, { v: b, s: sb[0] }]))[0] >= 4) any = true;
+  }
+  ok(any, "river: a board flagged as having a straight must have one");
+  if (/straight/.test(g.e)) ok(/makes/.test(g.e), "river: an explanation that mentions a straight must name it");
+});
 
 // 10. The version shown in the app must match the service worker cache
 const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-(\d+\.\d+)"/);

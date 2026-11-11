@@ -648,6 +648,17 @@ function strPossible(board){
   var rs={};board.forEach(function(c){rs[c.v]=1;if(c.v===14)rs[1]=1;});
   for(var w=1;w<=10;w++){var n=0;for(var k=w;k<w+5;k++)if(rs[k])n++;if(n>=3)return true;}return false;
 }
+/* Names the straights on a board, so the explanation shows the hand instead of just saying one is possible:
+   "52 makes A-2-3-4-5", "any 9 makes 7-8-9-T-J". Highest first, at most three. */
+function strNames(board){
+  var rs={};board.forEach(function(c){rs[c.v]=1;if(c.v===14)rs[1]=1;});
+  var out=[],seen={},r=function(k){return k===1?"A":rc(k);};
+  for(var w=10;w>=1;w--){var miss=[],n=0;for(var k=w;k<w+5;k++){if(rs[k])n++;else miss.push(k);}
+    if(n<3)continue;var need=miss.slice().reverse().map(r).join("");if(seen[need])continue;seen[need]=1;
+    var run=[];for(var k2=w;k2<w+5;k2++)run.push(r(k2));
+    out.push((miss.length===1?"any "+need:need)+" makes "+run.join("-"));}
+  return out.slice(0,3).join("; ");
+}
 T("River vs big bets",null,function(){
   for(var t=0;t<800;t++){
     var board=dealFrom(5,[]);var vs=board.map(function(c){return c.v;});
@@ -669,17 +680,17 @@ T("River vs big bets",null,function(){
     var act=opp==="solid"?"A solid player who rarely bluffs bet the flop and turn. River: pot is "+P+", they bet "+bet+".":
       opp==="bluffer"?"This player has shown two river bluffs tonight. They bet the flop and turn. River: pot is "+P+", they bet "+bet+".":
       "Opponent bet the flop and turn. River: pot is "+P+", they bet "+bet+".";
-    var sp=strPossible(board),F=false,C=false,R=false,nm=type==="top"?"top pair":type==="two"?"top two pair":"a set",hiSet=type==="set"&&hole[0].v===sorted[0];
+    var sp=strPossible(board),sn=sp?strNames(board):"",F=false,C=false,R=false,nm=type==="top"?"top pair":type==="two"?"top two pair":"a set",hiSet=type==="set"&&hole[0].v===sorted[0];
     var w="Your hand: "+hname(s)+". Calling "+bet+" to win "+(P+2*bet)+" means you need to win "+need+"% of the time. ";
     if(type==="top"){
-      if(opp==="solid"){F=true;w+="List the hands a solid player bets big on three streets: two pair, sets"+(sp?", straights (one is possible on this board)":"")+", and maybe a better kicker. Almost no worse hand bets this way, and few bluffs do. Top pair wins far less than "+need+"%.";}
+      if(opp==="solid"){F=true;w+="List the hands a solid player bets big on three streets: two pair, sets"+(sp?", straights ("+sn+")":"")+", and maybe a better kicker. Almost no worse hand bets this way, and few bluffs do. Top pair wins far less than "+need+"%.";}
       else if(opp==="bluffer"){C=true;w+="This player’s range now includes real bluffs: missed draws and air. Top pair beats every bluff, so it wins more than "+need+"% even though it loses to their value hands.";}
       else {C=true;w+="A small bet gives you a great price. Top pair only has to be good about 1 time in "+Math.round(100/need)+", and it easily is against everything a player bets small with.";}}
     else if(type==="two"){
-      if(opp==="solid"){C=true;w+="Top two pair beats top pair, overpairs, weaker two pairs and every bluff. Only sets"+(sp?" and straights":"")+" beat you. Even a solid player bets big with enough worse hands that this is a call"+(sp?", but not a raise, because the straight is one of their likely value hands":"")+".";}
+      if(opp==="solid"){C=true;w+="Top two pair beats top pair, overpairs, weaker two pairs and every bluff. Only sets"+(sp?" and straights ("+sn+")":"")+" beat you. Even a solid player bets big with enough worse hands that this is a call"+(sp?", but not a raise, because the straight is one of their likely value hands":"")+".";}
       else {C=true;R=true;w+="Two pair beats most of their range. Calling is clearly fine, and raising for value is fine too, because worse hands like top pair may call.";}}
-    else if(sp&&opp==="solid"){C=true;w+="A set is strong, but a straight is possible, and a solid player who bets big on every street often has exactly that. Call: you beat their two pairs and weaker sets. Raising only gets called by the straight.";}
-    else {R=true;if(sp&&opp!=="solid")C=true;w+="A set is near the top of your possible hands here ("+(hiSet?"":"only a higher set ")+(sp?(hiSet?"only a straight beats you":"or a straight beats you"):(hiSet?"nothing beats you":"beats you"))+"). Raise for value: worse two pairs and sets call."+(sp?" Calling is also fine, since a straight is possible.":"");}
+    else if(sp&&opp==="solid"){C=true;w+="A set is strong, but a straight is possible ("+sn+"), and a solid player who bets big on every street often has exactly that. Call: you beat their two pairs and weaker sets. Raising only gets called by the straight.";}
+    else {R=true;if(sp&&opp!=="solid")C=true;w+="A set is near the top of your possible hands here ("+(hiSet?"":"only a higher set ")+(sp?(hiSet?"only a straight beats you":"or a straight beats you"):(hiSet?"nothing beats you":"beats you"))+"). Raise for value: worse two pairs and sets call."+(sp?" Calling is also fine, since a straight is possible ("+sn+").":"");}
     return {sk:type+"|"+opp+(sp?"|str":""),tag:"River",kind:type,vil:opp,sp:sp,act:act,board:board,hand:hole,q:"You have "+nm+". What do you do?",
       o:[O("Fold",F),O("Call "+bet,C),O("Raise",R)],
       e:E(w,"Before calling a river bet, list the worse hands that would bet this way. If you can’t name many, and the player rarely bluffs, fold. The bigger the bet and the more streets they’ve bet, the stronger their range.",
@@ -1087,7 +1098,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-1.N); the tests check it. Bump the second number every
    release. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"1.17",at:"2026-11-11T16:31Z"};
+var BUILD={v:"1.18",at:"2026-11-11T16:33Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
