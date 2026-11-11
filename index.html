@@ -1031,8 +1031,14 @@ function variant(topic,f,skill,avoid){
 
 /* ===================== State ===================== */
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
-   v must match the cache name in sw.js (holdem-drill-vN); the tests check it. */
-var BUILD={v:12,date:"11 Nov 2026"};
+   v must match the cache name in sw.js (holdem-drill-1.N); the tests check it. Bump the second number every
+   release. at is the release time in UTC, shown in the phone's own time zone. */
+var BUILD={v:"1.13",at:"2026-11-11T09:56Z"};
+function buildText(){
+  var d=new Date(BUILD.at),t;
+  try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
+  return "v"+BUILD.v+" · built "+t;
+}
 var TOPICS=Object.keys(G);
 var KEY="endlessHoldemDrill.v2";
 function load(){try{var s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.by)return s;}catch(e){}return null;}
@@ -1258,7 +1264,7 @@ function applyTheme(){
 try{new MutationObserver(function(){if(!applying){var want=st.theme==="auto"?null:(st.theme||"dark");if(want&&document.documentElement.getAttribute("data-theme")!==want)applyTheme();}}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
 try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(st.theme==="auto"){applyTheme();renderTop();}});}catch(e){}
 applyTheme();
-$("ver").textContent=$("ver2").textContent="Version "+BUILD.v+" · built "+BUILD.date;
+$("ver").textContent=$("ver2").textContent=buildText();
 renderTop();next();
 </script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
