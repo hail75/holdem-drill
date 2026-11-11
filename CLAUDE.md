@@ -19,12 +19,15 @@ A mobile-first practice app for **live No-Limit Hold'em cash games, heads-up to 
 7. **Range helpers**: `RSPEC` (who plays each chart, the verb, and which hands re-raise via `prem`), `isPrem(kind, h)`, `rangeGrid(key, highlight)`, `rangeText(key)`, `chartPct`. Percentages in the text come from `chartPct`, never typed by hand.
 8. **Skills and reviews**: `skillOf(g)` names what a spot tests (`topic|sk`, else `topic|rkey`). Every generator sets `sk` unless `rkey` already says it (for example `Flop c-bets|nothing|dry`, `River vs big bets|top|solid`). `variant(topic, f, skill)` deals a new spot of the same skill. When adding a generator, give it an `sk`; the tests check that every skill can be dealt again.
 9. **UI and state** (after `/* ===== State`): localStorage key `endlessHoldemDrill.v2`. Table size is a range `st.lo`..`st.hi` set by a two-handle slider (either handle can be either end). Theme switch (`st.theme`: dark, light, or auto) sets `data-theme` on `<html>`, and a MutationObserver re-applies it if the host changes it.
-10. **Smart mode** (how the app helps you remember):
+10. **Learn ranges** (book button in the header): `learnGroups(f)` lists every chart for one table size (opening, big blind defense, facing a raise, short stack), shown as cards with `learnNote(k)`, the grid and the edges. "Drill this chart" sets `focus` and `next()` deals only spots for that chart via `drillSpot(k, f)` until Stop. The tests check every listed chart can be drilled. When adding a chart, add it to `learnGroups`.
+11. **Smart mode** (how the app helps you remember):
    - **Review ladder** (`st.rev`, keyed by skill, `LADDER`): a miss puts the skill in box 0 and the exact spot returns 3-4 spots later. Each right answer moves it up: box 1 after ~10 spots and box 2 after ~25 spots (both with new cards), then 1, 3 and 7 days. Right at the last box = mastered (`st.mastered`). A miss at any box sends it back to box 0. This is successive relearning (Rawson & Dunlosky): retrieve until right, then relearn at growing gaps.
    - Each queued skill stores the version that saved it (`ver`). A box-0 spot saved by an older version is dealt fresh instead of replayed, so old wording never comes back. `variant` falls back to a fresh copy of the same question when a skill has only one spot.
    - Reviews show up as "second try" (box 0) or "review" and are never served twice in a row unless 4+ are due, so new spots stay mixed in (interleaving). The feedback says when the skill comes back.
    - Topic mix: `weighted()` uses `st.ew`, a recent error rate per topic (each answer counts 20%), not lifetime accuracy.
    - Random mode turns all of this off.
+
+The Learn view is not a topic: it shows charts, and drilling uses the existing topics.
 
 Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3-bets, Flop c-bets, River vs big bets, Pot odds, Draws & equity, Preflop ranges, All-in decisions, Adaptation.
 

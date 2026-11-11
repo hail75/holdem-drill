@@ -157,6 +157,27 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .btn.alt{background:transparent;color:var(--muted);border:1.5px solid var(--line);font-size:14px;font-weight:600;min-height:42px;padding:8px;box-shadow:none;margin-top:14px}
 .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:6px}
 .foot{margin-top:12px;text-align:center}
+.iconbtn[aria-pressed="true"]{background:var(--felt);border-color:var(--felt);color:var(--felt-ink)}
+.top{gap:8px}
+.drillbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--surface);border:1.5px solid var(--gold);font-size:13.5px;font-weight:600}
+.drillbar .chip{min-height:44px}
+.learn{margin-top:12px}
+.lhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.lhead h2{font-family:var(--serif);font-size:22px;margin:0}
+.lhead .chip{min-height:44px}
+.lsizes{display:grid;gap:4px;margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:9px;background:transparent;color:var(--muted);min-height:44px;cursor:pointer}
+.seg[aria-pressed="true"]{background:var(--felt);color:var(--felt-ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.lcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:8px;overflow:hidden}
+.lcard summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;min-height:48px;cursor:pointer;font-weight:600;list-style:none}
+.lcard summary::-webkit-details-marker{display:none}
+.lcard summary::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-left:4px}
+.lcard[open] summary::after{transform:rotate(-135deg)}
+.lcard summary span{flex:1}
+.lcard summary b{font-family:var(--serif);color:var(--gold)}
+.lbody{padding:0 14px 14px}
+.lbody .es:first-child{margin-top:0}
+.ldrill{margin-top:14px;box-sizing:border-box}
 .ver{text-align:center;margin-top:4px;font-size:12px;opacity:.8}
 
 /* Settings sheet */
@@ -202,6 +223,7 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
   <header class="top">
     <div class="brand"><svg class="logo" viewBox="0 0 100 100" aria-hidden="true"> <defs><linearGradient id="hdFelt" x1="0.3" y1="0" x2="0.7" y2="1"><stop offset="0" stop-color="#2b7a57"/><stop offset="1" stop-color="#164a34"/></linearGradient></defs> <rect width="100" height="100" rx="22" fill="url(#hdFelt)"/> <g fill="#d9a53a"><circle cx="50" cy="36" r="11"/><circle cx="38" cy="54" r="11"/><circle cx="62" cy="54" r="11"/><circle cx="50" cy="50" r="6"/><path d="M48.6 52Q48.4 66 41 73H59Q51.6 66 51.4 52Z"/></g> </svg><h1>Hold’em Drill</h1></div>
     <div class="pills" id="stats"></div>
+    <button class="iconbtn" id="learnbtn" data-act="learn" aria-pressed="false" aria-label="Learn ranges"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v15H5.5c-.8 0-1.5.7-1.5 1.5zM20 5.5c0-.8-.7-1.5-1.5-1.5H13v15h5.5c.8 0 1.5.7 1.5 1.5z"/></svg></button>
     <button class="iconbtn" data-act="settings" aria-label="Menu: settings and progress"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   </header>
   <div class="tsize" id="tsize" role="group" aria-label="Table size">
@@ -1015,6 +1037,35 @@ T("Adaptation",FMTS,function(f){
   return {steal:adSteal,fight:adFight,river:adRiver,bluff:adBluff,size:adSize,thin:adThin,check:adCheck,concept:adConcept}[k](f);
 });
 
+/* ===================== Learn ranges ===================== */
+/* Every chart a player needs at one table size, grouped the way the Learn view shows them. */
+function learnGroups(f){
+  var seats=seatsFor(f),uniq=function(a){return a.filter(function(k,i){return a.indexOf(k)===i;});};
+  if(f==="2")return [{t:"Opening",keys:["BTNHU"]},{t:"Big blind defense",keys:["BBHU"]},{t:"Short stack (6-12 big blinds)",keys:["PUSHHU"]}];
+  var opens=seats.slice(0,-1).map(function(s){return openKey(f,s);});
+  var bb=uniq(openSeats(f).map(bbKey).concat(["BBvSB"]));
+  var cc=[];seats.slice(0,-2).forEach(function(rz){seats.slice(seats.indexOf(rz)+1,-1).forEach(function(you){
+    var late=grp(rz)==="late",sb=you==="SB";cc.push(sb?(late?"CCSBL":"CCSBE"):(late?"CCL":"CCE"));});});
+  var push=uniq(seats.slice(0,-1).map(function(s){return pushKey(f,s);}));
+  return [{t:"Opening (everyone before you folded)",keys:opens},{t:"Big blind defense (one raise)",keys:bb},{t:"Facing a raise (not in the big blind)",keys:uniq(cc)},{t:"Short stack (6-12 big blinds)",keys:push}];
+}
+function learnNote(k){
+  var sp=RSPEC[k];
+  if(sp.verb==="open")return seatNote(k);
+  if(sp.verb==="defend")return (k==="BBHU"?"Heads-up the big blind gets a good price and the raiser opens most hands, so defend wide. ":
+    k==="BBvSB"?"The small blind raises bigger (to 6) and a little tighter than the button, but you have position on it after the flop. Those cancel out, so defend the same hands as against a button raise. ":
+    "You pay 3 more to win 11, so you need less than 30% equity, and you close the action. The earlier the raiser’s seat, the stronger their range and the tighter you defend. ")+PREMTXT[sp.prem];
+  if(sp.verb==="play")return FR_P+" "+PREMTXT[sp.prem];
+  return "With 6-12 big blinds, move all-in or fold. The fewer players left behind you, the wider you shove, because each one is another chance someone has a hand to call with.";
+}
+/* Topics that can deal a spot for a chart. */
+function drillTopics(k){var v=RSPEC[k].verb;return v==="open"?["Preflop opens","Preflop ranges"]:v==="defend"?["Big blind defense","Preflop ranges"]:v==="play"?["Facing a raise"]:["All-in decisions"];}
+function drillSpot(k,f){
+  var ts=drillTopics(k);
+  for(var i=0;i<6000;i++){var t=ts[i%ts.length],g=G[t].gen(f);if(g&&g.rkey===k){g.topic=t;g.fm=f;return g;}}
+  return null;
+}
+
 /* ===================== Skills ===================== */
 /* A skill is the piece of knowledge a spot tests: a seat's chart, a hand class on a board texture, a pot-odds
    fraction. Reviews ask the same skill again with new cards, so you learn the rule, not the one hand. */
@@ -1036,7 +1087,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-1.N); the tests check it. Bump the second number every
    release. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"1.14",at:"2026-11-11T10:20Z"};
+var BUILD={v:"1.15",at:"2026-11-11T16:21Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1071,7 +1122,7 @@ st.ew=st.ew||{};TOPICS.forEach(function(t){if(st.ew[t]===undefined){var b=st.by[
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
 /* Ask the browser to keep this data instead of clearing it when space runs low or the app goes unused. Harmless if refused. */
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});}catch(e){}
-var cur=null,picked=null,lastRev=false;
+var cur=null,picked=null,lastRev=false,focus=null,view="practice";
 
 /* ===================== Rendering helpers ===================== */
 function $(id){return document.getElementById(id);}
@@ -1137,7 +1188,8 @@ function next(){
   var on=TOPICS.filter(function(t){return st.on[t]&&available(t);});
   if(!on.length){cur=null;picked=null;$("quiz").innerHTML='<div class="scene"><div class="qa"><p>Turn on at least one topic in the menu.</p></div></div>';$("bar").hidden=true;return;}
   var g=null;
-  if(st.smart!==false){
+  if(focus){g=drillSpot(focus.k,focus.f);if(g)g.drill=true;}
+  if(!g&&st.smart!==false){
     /* Due reviews, lowest box first (freshest mistakes matter most). Never two reviews in a row unless several are waiting,
        so new spots stay mixed in. */
     var due=Object.keys(st.rev).filter(function(k){return isDue(st.rev[k])&&usable(st.rev[k]);}).sort(function(a,b){return st.rev[a].box-st.rev[b].box||st.rev[a].due-st.rev[b].due;});
@@ -1161,9 +1213,30 @@ function next(){
   if(!g.fixed){var idx=shuffle(g.o.map(function(_,i){return i;}));g.o=idx.map(function(i){return g.o[i];});}
   cur=g;picked=null;renderQ();try{window.scrollTo(0,0);}catch(e){}
 }
+function renderLearn(){
+  var sizes=FMTS.filter(inRange);if(sizes.indexOf(st.lf)<0)st.lf=sizes[0];
+  var f=st.lf,h='<div class="learn"><div class="lhead"><h2>Learn ranges</h2><button class="chip small" data-act="practice">Back to practice</button></div>';
+  h+='<p class="muted small">Every preflop chart for the table size you pick. Tap a chart to open it, then drill it until the edges stick. Change the table sizes with the slider above.</p>';
+  if(sizes.length>1)h+='<div class="lsizes" role="group" aria-label="Table size to study" style="grid-template-columns:repeat('+Math.min(sizes.length,4)+',1fr)">'+sizes.map(function(x){return '<button class="seg" data-lf="'+x+'" aria-pressed="'+(x===f)+'">'+FN[x]+'</button>';}).join("")+'</div>';
+  learnGroups(f).forEach(function(gr){
+    h+='<div class="sec">'+gr.t+'</div>';
+    gr.keys.forEach(function(k){var sp=RSPEC[k],open=!!(st.lopen&&st.lopen[f+"|"+k]);
+      h+='<details class="lcard" data-lk="'+f+'|'+k+'"'+(open?' open':'')+'><summary><span>'+cap(sp.desc)+'</span><b>'+chartPct(CH[sp.ch])+'%</b></summary><div class="lbody">'+
+        '<p class="es">'+color(learnNote(k))+'</p>'+rangeGrid(k,"")+'<div class="es"><span class="eh">Edges to remember</span>'+color(rangeText(k))+'</div>'+
+        '<button class="btn ldrill" data-drill="'+k+'" data-f="'+f+'">Drill this chart</button></div></details>';});
+  });
+  h+='</div>';
+  $("quiz").innerHTML=h;$("bar").hidden=true;
+}
+function setView(v){
+  view=v;$("learnbtn").setAttribute("aria-pressed",v==="learn");
+  if(v==="learn"){renderLearn();try{window.scrollTo(0,0);}catch(e){}}
+  else if(cur&&(!cur.f||inRange(cur.f)))renderQ();else next();
+}
 function renderQ(){
   var g=cur,tag=g.f&&g.you?FN[g.f]+" · You: "+(g.f==="2"&&g.you==="BTN"?"Button (SB)":TAGNAME[g.you]):(g.tag||"");
-  var h='<div class="scene"><div class="felt"><div class="head"><span class="topic">'+g.topic+(g.rv?' <span class="again">· '+(g.box===0?'second try':'review')+'</span>':'')+'</span>'+(tag?'<span class="tag">'+tag+'</span>':'')+'</div>';
+  var h=focus?'<div class="drillbar"><span>Drilling: '+cap(RSPEC[focus.k].desc)+' · '+FN[focus.f]+'</span><button class="chip small" data-act="stopdrill">Stop</button></div>':'';
+  h+='<div class="scene"><div class="felt"><div class="head"><span class="topic">'+g.topic+(g.rv?' <span class="again">· '+(g.box===0?'second try':'review')+'</span>':'')+'</span>'+(tag?'<span class="tag">'+tag+'</span>':'')+'</div>';
   h+=seatStrip(g);
   if(g.act)h+='<p class="act">'+color(g.act)+'</p>';
   if(g.board)h+=row("Board",g.board);
@@ -1215,6 +1288,8 @@ function tsRead(){var a=+tsA.value,b=+tsB.value;return [Math.min(a,b),Math.max(a
 function tsCommit(){
   var v=tsRead();if(v[0]===st.lo&&v[1]===st.hi)return;
   st.lo=v[0];st.hi=v[1];save();renderTop();
+  if(focus&&!inRange(focus.f))focus=null;
+  if(view==="learn"){renderLearn();return;}
   if(!cur||(cur.f&&!inRange(cur.f))||!available(cur.topic))next();
 }
 tsA.value=st.lo;tsB.value=st.hi;
@@ -1241,7 +1316,12 @@ document.addEventListener("click",function(e){
     save();applyTheme();renderTop();return;}
   if(b.dataset.topic){st.on[b.dataset.topic]=!st.on[b.dataset.topic];save();renderTop();if(!cur||!st.on[cur.topic]||!available(cur.topic))next();return;}
   if(b.dataset.i!==undefined){answer(+b.dataset.i);return;}
+  if(b.dataset.lf){st.lf=b.dataset.lf;save();renderLearn();return;}
+  if(b.dataset.drill){focus={k:b.dataset.drill,f:b.dataset.f};view="practice";$("learnbtn").setAttribute("aria-pressed","false");next();return;}
   var a=b.dataset.act;
+  if(a==="learn"){setView(view==="learn"?"practice":"learn");return;}
+  if(a==="practice"){setView("practice");return;}
+  if(a==="stopdrill"){focus=null;next();return;}
   if(a==="settings"){renderTop();$("sheet").hidden=false;return;}
   if(a==="close"){$("sheet").hidden=true;return;}
   if(a==="next")next();
@@ -1250,7 +1330,12 @@ document.addEventListener("click",function(e){
   else if(a==="clearmiss"){st.miss=[];save();renderTop();}
   else if(a==="reset"){if(!confirm("Reset all your stats?"))return;st.n=0;st.c=0;st.streak=0;st.bestStreak=0;st.miss=[];st.rev={};st.mastered=0;TOPICS.forEach(function(t){st.by[t]=[0,0];st.ew[t]=.5;});save();renderTop();}
 });
+document.addEventListener("toggle",function(e){
+  var d=e.target;if(!d||!d.dataset||!d.dataset.lk)return;
+  st.lopen=st.lopen||{};if(d.open)st.lopen[d.dataset.lk]=1;else delete st.lopen[d.dataset.lk];save();
+},true);
 document.addEventListener("keydown",function(e){
+  if(view==="learn")return;
   if(e.key==="Escape"&&!$("sheet").hidden){$("sheet").hidden=true;return;}
   if(!$("sheet").hidden)return;
   var tg=e.target&&e.target.tagName;if(tg==="SUMMARY"||tg==="INPUT")return;
