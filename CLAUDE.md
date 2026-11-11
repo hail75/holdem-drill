@@ -77,6 +77,7 @@ Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3
 - Solid player betting big on three streets: fold top pair. Call top two pair.
 - With a set: raise, **except** call when a straight is possible against a solid player.
 - A proven bluffer, or a small bet: call top pair.
+- Raise size (`riverRaise`): about 2.5x their bet, rounded to 5; all-in when that is 80% or more of what is left (200 minus half the pot). Every raise option shows its size.
 
 **Pot odds:** need = call ÷ (pot + bet + call). A bluff breaks even when they fold bet ÷ (pot + bet) of the time. Pots in the quiz divide evenly, so answers match the memorized prices (1/3 pot: call needs 20%, bluff needs 25%). Draw equity uses outs ×4 on the flop **only when the opponent is all-in**, and ×2 on the turn.
 

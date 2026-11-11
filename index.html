@@ -659,6 +659,13 @@ function strNames(board){
     out.push((miss.length===1?"any "+need:need)+" makes "+run.join("-"));}
   return out.slice(0,3).join("; ");
 }
+/* River raise size: about 2.5x their bet, rounded to 5. If that is most of what you have left, move all-in instead.
+   behind = chips left after calling the flop and turn (each player put in about half the pot from 200). */
+function riverRaise(bet,P){
+  var behind=200-P/2,r=Math.round(bet*2.5/5)*5;
+  if(r>=behind*.8)return {all:true,n:behind,t:"Raise all-in ("+behind+")",why:"Raise all-in for your last "+behind+". A raise to about 2.5 times their bet would put in most of your stack anyway, and leaving a few chips behind only gives them a cheap way out."};
+  return {all:false,n:r,t:"Raise to "+r,why:"Raise to about 2.5 times their bet ("+r+"). That wins much more than a call when a worse hand pays you, but it is still small enough for worse two pairs and sets to call. A min-raise wins too little, and a huge overbet only gets called by better."};
+}
 T("River vs big bets",null,function(){
   for(var t=0;t<800;t++){
     var board=dealFrom(5,[]);var vs=board.map(function(c){return c.v;});
@@ -676,10 +683,10 @@ T("River vs big bets",null,function(){
     if(type==="top"&&!(s[0]===1&&s[1]===sorted[0]))continue;
     if(type==="two"&&s[0]!==2)continue;
     if(type==="set"&&s[0]!==3)continue;
-    var opp=pick(["solid","bluffer","small"]),P=40+10*rnd(9),bet=opp==="small"?Math.round(P/4):P,need=Math.round(bet/(P+2*bet)*100);
-    var act=opp==="solid"?"A solid player who rarely bluffs bet the flop and turn. River: pot is "+P+", they bet "+bet+".":
-      opp==="bluffer"?"This player has shown two river bluffs tonight. They bet the flop and turn. River: pot is "+P+", they bet "+bet+".":
-      "Opponent bet the flop and turn. River: pot is "+P+", they bet "+bet+".";
+    var opp=pick(["solid","bluffer","small"]),P=40+10*rnd(9),bet=opp==="small"?Math.round(P/4):P,need=Math.round(bet/(P+2*bet)*100),RZ=riverRaise(bet,P);
+    var act=opp==="solid"?"A solid player who rarely bluffs bet the flop and turn. River: pot is "+P+", they bet "+bet+". You have "+(200-P/2)+" left.":
+      opp==="bluffer"?"This player has shown two river bluffs tonight. They bet the flop and turn. River: pot is "+P+", they bet "+bet+". You have "+(200-P/2)+" left.":
+      "Opponent bet the flop and turn. River: pot is "+P+", they bet "+bet+". You have "+(200-P/2)+" left.";
     var sp=strPossible(board),sn=sp?strNames(board):"",F=false,C=false,R=false,nm=type==="top"?"top pair":type==="two"?"top two pair":"a set",hiSet=type==="set"&&hole[0].v===sorted[0];
     var w="Your hand: "+hname(s)+". Calling "+bet+" to win "+(P+2*bet)+" means you need to win "+need+"% of the time. ";
     if(type==="top"){
@@ -691,8 +698,9 @@ T("River vs big bets",null,function(){
       else {C=true;R=true;w+="Two pair beats most of their range. Calling is clearly fine, and raising for value is fine too, because worse hands like top pair may call.";}}
     else if(sp&&opp==="solid"){C=true;w+="A set is strong, but a straight is possible ("+sn+"), and a solid player who bets big on every street often has exactly that. Call: you beat their two pairs and weaker sets. Raising only gets called by the straight.";}
     else {R=true;if(sp&&opp!=="solid")C=true;w+="A set is near the top of your possible hands here ("+(hiSet?"":"only a higher set ")+(sp?(hiSet?"only a straight beats you":"or a straight beats you"):(hiSet?"nothing beats you":"beats you"))+"). Raise for value: worse two pairs and sets call."+(sp?" Calling is also fine, since a straight is possible ("+sn+").":"");}
+    if(R)w+=" "+RZ.why;
     return {sk:type+"|"+opp+(sp?"|str":""),tag:"River",kind:type,vil:opp,sp:sp,act:act,board:board,hand:hole,q:"You have "+nm+". What do you do?",
-      o:[O("Fold",F),O("Call "+bet,C),O("Raise",R)],
+      o:[O("Fold",F),O("Call "+bet,C),O(RZ.t,R)],
       e:E(w,"Before calling a river bet, list the worse hands that would bet this way. If you can’t name many, and the player rarely bluffs, fold. The bigger the bet and the more streets they’ve bet, the stronger their range.",
         "Calling big bets on every street with one pair because “it’s top pair.” Top pair wins small pots. Big pots usually need two pair or better.")};
   }
@@ -973,8 +981,9 @@ function adRiver(){
   var t=pick(AD_RIV),perm=shuffle([0,1,2,3]),P=40+10*rnd(7),bluffer=Math.random()<.6;
   var read=bluffer?"You folded to this player’s big river bets three times. Since then they’ve bet big on almost every river against you and showed a bluff once.":
     "This player rarely bluffs, and nothing has changed tonight.";
-  return {sk:"river|"+bluffer,tag:"River",act:read+" They bet the flop and turn. River: pot is "+P+", they bet "+P+".",board:parse(t.b,perm),hand:parse(t.h,perm),
-    q:"You have top pair. What do you do?",o:[O("Fold",!bluffer),O("Call "+P,bluffer),O("Raise",false)],
+  var RZ=riverRaise(P,P);
+  return {sk:"river|"+bluffer,tag:"River",act:read+" They bet the flop and turn. River: pot is "+P+", they bet "+P+". You have "+(200-P/2)+" left.",board:parse(t.b,perm),hand:parse(t.h,perm),
+    q:"You have top pair. What do you do?",o:[O("Fold",!bluffer),O("Call "+P,bluffer),O(RZ.t,false)],
     e:E(bluffer?"Your old rule (fold one pair to big river bets) worked against players who don’t bluff. This player noticed it and started bluffing you. Now their big bets include many missed draws, and top pair beats every bluff. You need 33%, and you win more often than that.":
       "No change in their behavior means no change in yours. A non-bluffer’s pot-size river bet after betting every street is usually two pair or better. Fold.",AD_PRIN,
       bluffer?"Sticking to a rule after the opponent has adjusted to it. Rules are starting points, not laws.":"Calling “to keep them honest” against someone who is already honest.")};
@@ -1022,8 +1031,8 @@ function adCheck(f){
     var aggro=Math.random()<.55,pot=potFor(f);
     var read=aggro?"This player bets almost every time you check to them.":"This player is passive and usually checks back when you check.";
     return {sk:"check|"+aggro,f:f,you:"BB",out:others(f,["BB","BTN"]),sub:{BTN:"Raise"},act:read+" You called their button raise. Pot is "+pot+". You act first.",board:flop,hand:r.cards,q:"You have "+fi.name+". What do you do?",
-      o:[O("Check, planning to raise their bet",aggro),O("Bet about "+Math.round(pot*.7),!aggro)],fixed:true,
-      e:E(aggro?"You flopped a strong hand against someone who bets whenever you check. Let them bet with their bluffs and weak hands, then raise. If you bet first, their weak hands just fold.":
+      o:[O("Check, then raise their bet to about 3x",aggro),O("Bet about "+Math.round(pot*.7),!aggro)],fixed:true,
+      e:E(aggro?"You flopped a strong hand against someone who bets whenever you check. Let them bet with their bluffs and weak hands, then raise to about 3 times their bet (a bet of 6 becomes 18). That builds a pot worth winning while their weak hands are already committed to it. If you bet first, their weak hands just fold.":
         "A passive player won’t bet for you. If you check, they check back and you lose a whole street of value. Bet your strong hand yourself.",AD_PRIN,
         aggro?"Betting into an aggressive player and folding out all the hands they would have bluffed with.":"Slow-playing against a passive player, who gives you free cards and gives you nothing.")};
   }
@@ -1098,7 +1107,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-1.N); the tests check it. Bump the second number every
    release. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"1.18",at:"2026-11-11T16:33Z"};
+var BUILD={v:"1.19",at:"2026-11-11T16:42Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
