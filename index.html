@@ -147,6 +147,16 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .chip[aria-pressed="true"]{background:var(--felt);border-color:var(--felt);color:var(--felt-ink);font-weight:600}
 .chip:disabled{opacity:.4;cursor:not-allowed}
 .chip.small{font-size:13px;min-height:34px;padding:5px 10px}
+.tgl{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:48px;padding:6px 0;font:inherit;font-size:15px;color:var(--ink);background:none;border:0;text-align:left;cursor:pointer}
+.tgl+.tgl{border-top:1px solid var(--line)}
+.tgl small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.tgl .sw{flex:none;position:relative;width:46px;height:28px;border-radius:999px;background:var(--line);transition:background .2s}
+.tgl .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .2s}
+.tgl[aria-checked="true"] .sw{background:var(--felt)}
+.tgl[aria-checked="true"] .sw::after{transform:translateX(18px)}
+.tgl:disabled{opacity:.45;cursor:not-allowed}
+.tgl:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:8px}
+@media (prefers-reduced-motion:reduce){.tgl .sw,.tgl .sw::after{transition:none}}
 .trow{display:grid;grid-template-columns:1fr 90px 40px;gap:10px;align-items:center;font-size:14px;padding:5px 0}
 .bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--felt)}
 .pct{text-align:right;color:var(--muted)}
@@ -179,10 +189,9 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
     <div class="grab"></div>
     <div class="phead"><h2>Settings &amp; progress</h2><button class="iconbtn" data-act="close" aria-label="Close">✕</button></div>
     <div class="sec">Appearance</div>
-    <div class="chips" id="themes"></div>
+    <div id="themes"></div>
     <div class="sec">Practice mode</div>
-    <div class="chips" id="modes"></div>
-    <p class="muted small" style="margin-top:6px">Smart mode gives you more questions from topics where you make more mistakes. Every topic still appears.</p>
+    <div id="modes"></div>
     <div class="sec">Topics <span id="sumTopics" style="text-transform:none;letter-spacing:0;font-weight:500"></span></div>
     <div class="chips" style="margin-bottom:8px"><button class="chip small" data-act="all">Select all</button><button class="chip small" data-act="none">Clear</button></div>
     <div class="chips" id="topics"></div>
@@ -837,8 +846,9 @@ function renderTop(){
   var onCount=TOPICS.filter(function(t){return st.on[t]&&available(t);}).length;
   $("sumTopics").textContent="· "+onCount+" of "+TOPICS.length+" on";
   var th=st.theme||"dark";
-  $("themes").innerHTML=[["dark","Dark"],["light","Light"],["auto","Follow device"]].map(function(x){return '<button class="chip" data-themeopt="'+x[0]+'" aria-pressed="'+(th===x[0])+'">'+x[1]+'</button>';}).join("");
-  $("modes").innerHTML='<button class="chip" data-mode="smart" aria-pressed="'+(st.smart!==false)+'">Smart: focus on weak topics</button><button class="chip" data-mode="random" aria-pressed="'+(st.smart===false)+'">Random</button>';
+  var dk=document.documentElement.getAttribute("data-theme")!=="light";
+  $("themes").innerHTML=tgl("dark",dk,"Dark mode","",th==="auto")+tgl("auto",th==="auto","Match device","Follow your phone’s light or dark setting.");
+  $("modes").innerHTML=tgl("smart",st.smart!==false,"Smart mode","More questions from topics where you make more mistakes. Every topic still appears.");
   $("topics").innerHTML=TOPICS.map(function(t){var av=available(t);return '<button class="chip" data-topic="'+t+'" aria-pressed="'+(!!st.on[t]&&av)+'"'+(av?'':' disabled title="Not available for the selected table sizes"')+'>'+t+'</button>';}).join("");
   var ts=TOPICS.filter(function(t){return st.by[t][1];}).map(function(t){var b=st.by[t],p=Math.round(b[0]/b[1]*100);
     return '<div class="trow"><span>'+t+'</span><span class="bar"><i style="width:'+p+'%"></i></span><span class="pct">'+p+'%</span></div>';}).join("");
@@ -902,8 +912,11 @@ function answer(i){
 document.addEventListener("click",function(e){
   if(e.target.id==="sheet"){$("sheet").hidden=true;return;}
   var b=e.target.closest("button");if(!b)return;
-  if(b.dataset.themeopt){st.theme=b.dataset.themeopt;save();applyTheme();renderTop();return;}
-  if(b.dataset.mode){st.smart=b.dataset.mode==="smart";save();renderTop();return;}
+  if(b.dataset.tgl){var k=b.dataset.tgl,on=b.getAttribute("aria-checked")!=="true";
+    if(k==="smart")st.smart=on;
+    else if(k==="dark")st.theme=on?"dark":"light";
+    else st.theme=on?"auto":(document.documentElement.getAttribute("data-theme")==="light"?"light":"dark");
+    save();applyTheme();renderTop();return;}
   if(b.dataset.fmt){st.fm[b.dataset.fmt]=!st.fm[b.dataset.fmt];save();renderTop();next();return;}
   if(b.dataset.topic){st.on[b.dataset.topic]=!st.on[b.dataset.topic];save();renderTop();if(!cur||!st.on[cur.topic]||!available(cur.topic))next();return;}
   if(b.dataset.i!==undefined){answer(+b.dataset.i);return;}
@@ -924,6 +937,7 @@ document.addEventListener("keydown",function(e){
   else if(picked!==null&&(e.key==="Enter"||e.key===" "||e.key==="ArrowRight")){e.preventDefault();next();}
 });
 var hostTheme=document.documentElement.getAttribute("data-theme"),applying=false;
+function tgl(k,on,label,sub,dis){return '<button class="tgl" role="switch" data-tgl="'+k+'" aria-checked="'+on+'"'+(dis?" disabled":"")+'><span>'+label+(sub?"<small>"+sub+"</small>":"")+'</span><span class="sw" aria-hidden="true"></span></button>';}
 function applyTheme(){
   var th=st.theme||"dark",root=document.documentElement;applying=true;
   if(th==="auto"){var dark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;root.setAttribute("data-theme",dark?"dark":"light");}
@@ -932,7 +946,7 @@ function applyTheme(){
   applying=false;
 }
 try{new MutationObserver(function(){if(!applying){var want=st.theme==="auto"?null:(st.theme||"dark");if(want&&document.documentElement.getAttribute("data-theme")!==want)applyTheme();}}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});}catch(e){}
-try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(st.theme==="auto")applyTheme();});}catch(e){}
+try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(st.theme==="auto"){applyTheme();renderTop();}});}catch(e){}
 applyTheme();
 renderTop();next();
 </script>
