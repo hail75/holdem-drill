@@ -139,7 +139,8 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .rg-wrap{margin-top:14px}
 .rg-title{font-size:13px;font-weight:600;margin-bottom:6px}
 .rg{display:grid;grid-template-columns:repeat(13,1fr);gap:2px;max-width:420px}
-.rc{font-size:9.5px;font-weight:600;text-align:center;padding:4px 0;border-radius:3px;line-height:1.1;font-variant-numeric:tabular-nums}
+.rc{font-size:8.5px;font-weight:600;text-align:center;padding:4px 0;border-radius:3px;line-height:1.1;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;font-variant-numeric:tabular-nums}
+@media (min-width:400px){.rc{font-size:9.5px}}
 .rc.in{background:var(--felt);color:var(--felt-ink)}
 .rc.p{background:#b8432f;color:#fff}
 .rc.out{background:var(--line);color:var(--muted)}
@@ -766,8 +767,8 @@ function chartPct(ch){var n=0;for(var i=0;i<13;i++)for(var j=0;j<13;j++){var h=c
 function rangeGrid(key,hl){
   var sp=RSPEC[key],ch=CH[sp.ch],h='<div class="rg-wrap"><div class="rg-title">'+cap(sp.desc)+': '+sp.verb+' about '+chartPct(ch)+'%</div><div class="rg">';
   for(var i=0;i<13;i++)for(var j=0;j<13;j++){var c=cellH(i,j),k=inCh(ch,c)?(sp.prem&&isPrem(sp.prem,c)?"p":"in"):"out";
-    h+='<span class="rc '+k+(c.label===hl?' hl':'')+'">'+c.label.replace(/[so]$/,'')+'</span>';}
-  h+='</div><div class="rg-leg"><span><i class="in"></i>'+(sp.prem?"Call":sp.verb==="shove"?"All-in":"Raise")+'</span>'+(sp.prem?'<span><i class="p"></i>Re-raise</span>':'')+'<span><i class="out"></i>Fold</span><span class="muted">Suited above the diagonal, offsuit below</span></div></div>';
+    h+='<span class="rc '+k+(c.label===hl?' hl':'')+'">'+c.label+'</span>';}
+  h+='</div><div class="rg-leg"><span><i class="in"></i>'+(sp.prem?"Call":sp.verb==="shove"?"All-in":"Raise")+'</span>'+(sp.prem?'<span><i class="p"></i>Re-raise</span>':'')+'<span><i class="out"></i>Fold</span></div></div>';
   return h;
 }
 function rangeText(key){
@@ -1086,7 +1087,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-1.N); the tests check it. Bump the second number every
    release. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"1.16",at:"2026-11-11T16:26Z"};
+var BUILD={v:"1.17",at:"2026-11-11T16:31Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
