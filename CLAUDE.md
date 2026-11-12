@@ -5,6 +5,7 @@ A mobile-first practice app for **live No-Limit Hold'em cash games, heads-up to 
 ## Files
 - `index.html`: the entire app (HTML, CSS and JS in one file, no build step, no dependencies).
 - `manifest.webmanifest`, `sw.js`, `icon-*.png`, `apple-touch-icon.png`: installable PWA with offline support. **Every release: bump the version in both places, `CACHE` in `sw.js` (`holdem-drill-X.Y.Z`) and `BUILD` in `index.html` (`v:"X.Y.Z"`), and set `BUILD.at` to the release time in UTC (`"2026-11-11T09:55Z"`).** Versioning (owner's rule): a small fix bumps Z (2.0.0 → 2.0.1), a new feature bumps Y, a big change bumps X. The interface redesign counts as part of 2.x (a build was briefly labelled 3.0.0; it is 2.1). Do not go to 3.0 without the owner saying so. Settings shows "v2.0.0 · built 11 Nov 2026, 16:55" in the phone’s time zone, so you can tell when a deploy has loaded. The tests check the two versions match.
+- `fonts/`: the bundled web fonts. `docs/`: README screenshots (retake them after a visible UI change).
 - `icon.svg`: the one source for the logo. The header logo inlines it, and every PNG icon is rendered from it (maskable and apple-touch versions without the rounded corners). Change the logo there, then re-render the PNGs.
 - `tests/verify.mjs`: strategy and integrity checks. **Run `node tests/verify.mjs` after every change. It must print "All checks passed".**
 - Hosted on GitHub Pages from `main`, at the repo root.
@@ -115,7 +116,7 @@ Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3
 - **Text:** plain, direct English, no fluff. Typographic apostrophes and quotes (’ “ ”) in visible text, straight quotes in code.
 - **Ten:** card faces show **10**. Everywhere else (labels like KTo, charts, explanations) uses **T**.
 - **Seats:** named by distance from the button (lojack, hijack, cutoff), so a seat means the same thing at every table size. The table must fit 9 seats on a 360px screen with no seat overlapping another or the board.
-- **Fonts:** the system font stack only (`--sans`). No web fonts: the owner found Fraunces and Instrument Sans made it look like a generic AI-built app. `--serif` is kept as the name of the display face but points at the same stack.
+- **Fonts:** Fraunces for headings, numbers and card ranks (`--serif`), Instrument Sans for body text (`--sans`). The owner tried system fonts and four other serifs and chose to keep this pair: do not change it without asking. The font files are bundled in `fonts/` (latin subset, SIL Open Font License) and cached by `sw.js`; nothing loads from Google Fonts.
 - **Design:** mobile first. Palette: felt green (`--felt`), cream cards, gold accents (`--gold`). Every color is a CSS variable with light and dark values. The question and answers must fit on one phone screen without scrolling.
 - **Sound:** synthesized with Web Audio in `sfx(kind)` (no audio files): `deal` on a new spot with cards, and `fold`, `check`, `call`, `raise`, `allin` or `tap` chosen from the answer text by `sfxFor`. `st.sound` (Settings switch) turns it off.
 - **Accessibility:** keep tap targets at least 44px. Support keyboard input (1-3 to answer, Enter for next); there is no on-screen hint for it. Respect `prefers-reduced-motion`.
