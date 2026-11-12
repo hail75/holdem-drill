@@ -116,6 +116,7 @@ Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3
 - **Text:** plain, direct English, no fluff. Typographic apostrophes and quotes (’ “ ”) in visible text, straight quotes in code.
 - **Ten:** card faces show **10**. Everywhere else (labels like KTo, charts, explanations) uses **T**.
 - **Seats:** named by distance from the button (lojack, hijack, cutoff), so a seat means the same thing at every table size. The table must fit 9 seats on a 360px screen with no seat overlapping another or the board.
+- **Fonts:** the system font stack only (`--sans`). No web fonts: the owner found Fraunces and Instrument Sans made it look like a generic AI-built app. `--serif` is kept as the name of the display face but points at the same stack.
 - **Design:** mobile first. Palette: felt green (`--felt`), cream cards, gold accents (`--gold`). Every color is a CSS variable with light and dark values. The question and answers must fit on one phone screen without scrolling.
 - **Sound:** synthesized with Web Audio in `sfx(kind)` (no audio files): `deal` on a new spot with cards, and `fold`, `check`, `call`, `raise`, `allin` or `tap` chosen from the answer text by `sfxFor`. `st.sound` (Settings switch) turns it off.
 - **Accessibility:** keep tap targets at least 44px. Support keyboard input (1-3 to answer, Enter for next); there is no on-screen hint for it. Respect `prefers-reduced-motion`.
