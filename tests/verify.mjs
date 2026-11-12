@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,CONCEPTS,pairInfo,dealHand,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,CONCEPTS,ruleTable,pairInfo,dealHand,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -230,6 +230,14 @@ const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/ho
     if (g.stage !== "raise" && pi.draw && g.cat !== "top" && g.cat !== "strong") ok(false, "facing bets: a folding hand has a draw");
     if (g.stage !== "raise" && +g.o[1].t.split(" ")[1] !== g.bet) ok(false, "facing bets: call size");
     if (new Set(g.board.map(c => c.v)).size !== g.board.length) ok(false, "facing bets: paired board"); } }
+// Rule tables: the marked row names the play the spot grades as right
+{ const first = t => t.split(/[ .]/)[0];
+  for (const topic of ["Facing bets", "River vs big bets"]) for (let i = 0; i < 4000; i++) { const g = X.G[topic].gen(null); if (!g) continue; g.topic = topic;
+    const rt = X.ruleTable(g); if (!rt || !(rt.hi >= 0 && rt.hi < rt.rows.length)) { ok(false, "rule table missing: " + topic + " " + g.sk); continue; }
+    const row = rt.rows[rt.hi][1], right = g.o.filter(o => o.ok).map(o => first(o.t));
+    for (const r of right) if (!new RegExp(r, "i").test(row)) ok(false, `rule table row "${row}" does not name ${r} (${g.sk})`);
+    for (const w of ["Fold", "Call", "Raise"]) if (!right.some(r => /raise/i.test(w) ? /raise/i.test(r) : r === w) && rt.rows.length && new RegExp("^" + w + "$").test(row)) ok(false, `rule table row "${row}" names only a wrong play (${g.sk})`); } }
+
 // Whole hands: each street is a real spot, the pot adds up, and the hand stops when calling stops being right
 { let n = 0, four = 0; for (let i = 0; i < 4000; i++) { const f = X.FMTS[i % X.FMTS.length], H = X.dealHand(f); if (!H) continue; n++;
     const st = H.steps, names = ["Before the flop", "Flop", "Turn", "River"];

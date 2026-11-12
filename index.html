@@ -282,6 +282,7 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .gtable div+div{border-top:1px solid var(--line)}
 .gtable span{color:var(--muted)}
 .gtable b{font-weight:600}
+.gtable div.me{background:var(--good-bg)} .gtable div.me span{color:var(--ink);font-weight:600}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
 /* Bottom navigation */
@@ -1399,6 +1400,19 @@ T("Facing bets",null,function(){
   return null;
 });
 
+/* The rule table shown after a spot that has no range chart: every kind of hand in this situation and what it does,
+   with the row for your hand marked (hi). The text repeats the rules the generators follow; the tests check that. */
+function ruleTable(g){
+  if(g.topic==="Facing bets"&&g.stage==="flop")return {t:"Facing a bet on the flop",hi:{strong:0,top:1,mid2:2,low:3,nothing:3}[g.cat],rows:[
+    ["Two pair or better","Raise on a wet board. Call or raise on a dry one"],["Top pair or overpair","Call"],["Second pair","Call a small bet, fold to a big one"],["Weaker pair or nothing","Fold"]]};
+  if(g.topic==="Facing bets"&&g.stage==="turn")return {t:"Facing a second bet on the turn",hi:{strong:0,top:1}[g.cat]===undefined?2:{strong:0,top:1}[g.cat],rows:[
+    ["Two pair or better","Raise"],["Top pair or overpair","Call"],["Second pair or weaker","Fold"]]};
+  if(g.topic==="Facing bets"&&g.stage==="raise")return {t:"Raised after you bet the flop",hi:g.cat==="top"?0:g.monster?2:1,rows:[
+    ["Top pair or overpair","Fold to a passive player. Call a player who bluff-raises"],["Two pair","Call a passive player. Call or re-raise a player who bluff-raises"],["A set or better","Call or re-raise"]]};
+  if(g.topic==="River vs big bets"&&g.kind)return {t:"Facing a river bet",hi:{top:0,two:1,set:2}[g.kind],rows:[
+    ["Top pair or overpair","Fold to a solid player’s big bet. Call a bluffer or a small bet"],["Top two pair","Call a solid player. Call or raise the others"],["A set","Raise. Against a solid player, just call when a straight is possible"]]};
+  return null;
+}
 /* A whole hand, one decision per street: you call a raise before the flop, then face bets on the flop, turn and river.
    The hand follows the right play: it goes on while calling is right and stops when the right play is to fold (or to
    re-raise before the flop, which wins it there). Every step is a normal spot of an existing topic, so a missed street
@@ -1664,7 +1678,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.4.1",at:"2026-11-12T17:35Z"};
+var BUILD={v:"2.5.0",at:"2026-11-12T17:42Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1743,10 +1757,14 @@ function explHTML(g,ok){
   var right=g.o.filter(function(o){return o.ok;}).map(function(o){return o.t;}).join(" or ");
   var h='<div class="verdict '+(ok?"good":"bad")+'" role="status"><span class="vi" aria-hidden="true">'+(ok?"✓":"✗")+'</span><div><b>'+(ok?"Correct":"Not quite")+'</b>'+
     (ok?'':'<span>Answer: '+color(right)+'</span>')+(g.memo?'<small>'+g.memo+'</small>':'')+'</div></div>';
+  /* The chart or rule table is always open during a whole hand, so you see where your hand sits on every street. */
+  var rt=ruleTable(g),openRef=!ok||!!(focus&&focus.h);
   secs.forEach(function(s,i){
     h+=i===0?'<div class="why">'+color(s[1])+'</div>':'<details class="more"'+(ok?'':' open')+'><summary>'+s[0]+CHEV+'</summary><div>'+color(s[1])+'</div></details>';
   });
-  if(g.rkey)h+='<details class="more"'+(ok?'':' open')+'><summary>The full range'+CHEV+'</summary><div>'+color(rangeText(g.rkey))+rangeGrid(g.rkey,g.rhl)+'</div></details>';
+  if(rt)h+='<details class="more"'+(openRef?' open':'')+'><summary>The rules'+CHEV+'</summary><div><p style="margin-bottom:8px">'+rt.t+':</p><div class="gtable">'+
+    rt.rows.map(function(r,i){return '<div'+(i===rt.hi?' class="me"':'')+'><span>'+r[0]+'</span><b>'+r[1]+'</b></div>';}).join("")+'</div></div></details>';
+  if(g.rkey)h+='<details class="more"'+(openRef?' open':'')+'><summary>The full range'+CHEV+'</summary><div>'+color(rangeText(g.rkey))+rangeGrid(g.rkey,g.rhl)+'</div></details>';
   return h;
 }
 function drillBar(){
