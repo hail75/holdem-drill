@@ -225,6 +225,44 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .page{margin-top:8px}
 .lead{font-size:14.5px;color:var(--muted)}
 .ltabs{margin:0 0 12px}
+.lprog{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--muted)}
+.lprog b{color:var(--ink);font-family:var(--serif);font-size:17px}
+.lprog .bar{display:block;margin-top:8px}
+.lnext{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:12px 14px;min-height:64px;font:inherit;text-align:left;color:var(--felt-ink);border:0;border-radius:14px;cursor:pointer;background:linear-gradient(180deg,var(--felt-2),var(--felt));box-shadow:0 6px 16px rgba(31,96,69,.25)}
+.lnext span:first-child{flex:1}
+.lnext small{display:block;font-size:12px;opacity:.85}
+.lnext b{display:block;font-size:16px;line-height:1.25}
+.lnext .go{flex:none;font-weight:700;font-size:14px;background:rgba(0,0,0,.22);border-radius:999px;padding:6px 12px}
+.lrow{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;margin-top:6px;padding:8px 12px;font:inherit;text-align:left;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.lrow svg{flex:none;transform:rotate(-90deg);color:var(--muted)}
+.lnum{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:14px;background:var(--surface-2);border:1.5px solid var(--line);color:var(--muted)}
+.lrow.pass .lnum{background:var(--felt);border-color:var(--felt);color:var(--felt-ink)}
+.lt{flex:1;min-width:0}
+.lt b{display:block;font-size:15px;line-height:1.25}
+.lt small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.lbar{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted)}
+.lbar .chip{min-height:44px}
+.ldots{display:flex;gap:5px;margin-top:8px}
+.ldots i{flex:1;height:4px;border-radius:4px;background:var(--line)}
+.ldots i.on{background:var(--good)}
+.lpage{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;font-size:16px;line-height:1.55}
+.lpage>small{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--good)}
+.lpage h2{font-family:var(--serif);font-size:22px;line-height:1.2;margin:4px 0 10px}
+.lpage p+p{margin-top:10px}
+.lpage .gtable,.lpage .rg-wrap{margin-top:14px}
+.ltip{margin-top:14px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--gold);background:rgba(217,165,58,.1);font-size:15px;line-height:1.45;font-weight:500}
+.ltip span{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px}
+.lnav{display:flex;gap:8px;margin-top:12px}
+.lnav .btn{margin-top:0}
+.lnav .btn.alt{flex:0 0 34%;min-height:52px;font-size:15px}
+.lres{text-align:center;border-radius:18px;padding:22px 16px;border:1.5px solid var(--line);margin-bottom:6px}
+.lres.good{background:var(--good-bg);border-color:var(--good)} .lres.bad{background:var(--bad-bg);border-color:var(--bad)}
+.lres small{font-size:12.5px;color:var(--muted);font-weight:600}
+.lres b{display:block;font-family:var(--serif);font-size:44px;line-height:1.1;margin:4px 0}
+.lres.good b{color:var(--good)} .lres.bad b{color:var(--bad)}
+.lres p{font-size:15px}
+.lres~.btn{margin-top:10px}
+.drillbar small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
 .lsizes+.lead,.lead+.lsizes{margin-top:10px}
 .gsum{font-family:var(--sans)!important;font-size:12.5px;font-weight:600;color:var(--muted)!important;text-align:right;max-width:46%}
 .gtable{border:1px solid var(--line);border-radius:10px;overflow:hidden}
@@ -345,7 +383,7 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
   </header>
   <main id="page" class="page"></main>
 </div>
-<div id="bar" hidden><div class="in"><button class="btn" data-act="next">Next spot →</button><p class="hint">Keys: 1-3 answer · Enter next</p></div></div>
+<div id="bar" hidden><div class="in"><button class="btn" id="nextbtn" data-act="next">Next spot →</button></div></div>
 <nav class="nav" id="nav" aria-label="Sections">
   <button data-nav="practice"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="10" height="14" rx="2"/><path d="M9 4h9a2 2 0 0 1 2 2v12"/></svg>Practice</button>
   <button data-nav="learn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v15H5.5c-.8 0-1.5.7-1.5 1.5zM20 5.5c0-.8-.7-1.5-1.5-1.5H13v15h5.5c.8 0 1.5.7 1.5 1.5z"/></svg>Learn</button>
@@ -1224,6 +1262,123 @@ var RAISE_GUIDE=[
     why:"A normal raise puts in a big part of a short stack and leaves you unable to fold to a re-raise. Shoving takes the blinds often and gets the full stack in when called. The fewer players behind you, the wider you shove."}
 ];
 
+/* ===================== Lessons ===================== */
+/* The course in the Learn tab. Each lesson is a few short pages and then a quiz of real spots from the matching
+   topic. A page has a heading h, body text p (HTML), and optionally rows (a two-column table, or a function that
+   returns one, so numbers come from the charts), chart (an RSPEC key) and tip (the one line to remember).
+   quiz: topic, n spots, pass mark, an optional test(g) to keep only the spots the lesson is about, and
+   need3 when the lesson needs at least three players. Every number repeats a rule in CLAUDE.md. */
+function pctRow(label,k){return [label,"About "+chartPct(CH[RSPEC[k].ch])+"%"];}
+function guideRows(title){for(var i=0;i<RAISE_GUIDE.length;i++)if(RAISE_GUIDE[i].t===title)return RAISE_GUIDE[i].rows;return [];}
+var UNITS=["Before the flop","Poker math","After the flop","All-in","Beating your game"];
+var LESSONS=[
+ {id:"position",unit:0,t:"Position: why your seat matters",quiz:{topic:"Preflop ranges",n:6,pass:5,test:function(g){return /^(size|in|out)\|/.test(g.sk)&&RSPEC[g.rkey].verb==="open";}},pages:[
+  {h:"Seats are named from the button",p:"<p>The button acts last on every street after the flop. That is the best seat at the table, so every other seat is named by how far it is from the button.</p><p>The <b>cutoff</b> is one seat before the button, the <b>hijack</b> two, the <b>lojack</b> three. The small blind and big blind sit after the button.</p><p>A smaller table just loses its earliest seats. A 4-handed table is cutoff, button, small blind, big blind. A 3-handed table starts at the button.</p>"},
+  {h:"Fewer players behind you, wider range",p:"<p>When you are first to put money in, every player still to act is another chance that someone holds a better hand. So the fewer players are left behind you, the more hands you can raise.</p>",
+   rows:function(){return [pctRow("Under the gun (8 behind)","UTG"),pctRow("Lojack (5 behind)","LJ"),pctRow("Hijack (4 behind)","HJ"),pctRow("Cutoff (3 behind)","CO"),pctRow("Button (2 behind)","BTN"),pctRow("Small blind (1 behind)","SB")];},
+   tip:"A seat plays the same range at every table size. What counts is who is left to act."},
+  {h:"Acting last is worth money",p:"<p>After the flop, the player who acts last sees what everyone else does before deciding. They can take a free card when checked to, bet when the others show weakness, and keep the pot small with a medium hand.</p><p>That is why the small blind opens <i>fewer</i> hands than the button, even though only one player is left behind it: it plays the whole hand out of position.</p>",
+   tip:"Two questions before every preflop decision: how many players are left to act, and will I act last after the flop?"}]},
+ {id:"open",unit:0,t:"Opening: raise or fold",quiz:{topic:"Preflop opens",n:8,pass:6},pages:[
+  {h:"First in, you raise or you fold",p:"<p>When nobody has entered the pot, you have two plays: raise or fold. Never limp.</p><p>A raise can win the blinds right away, and when it gets called you have the lead going to the flop. A limp can do neither: it lets the blinds in cheaply and wins nothing when everyone else folds.</p>",
+   rows:function(){return guideRows("Opening raise");},tip:"One size for every hand you open, so the size never gives your hand away."},
+  {h:"The button: about half of all hands",p:"<p>On the button only the two blinds are left, and you act last after the flop. Raise about half of all hands: every pair, every suited ace and king, most suited cards that connect, and offsuit hands with two decent cards.</p>",chart:"BTN",
+   tip:"Learn the edges, not the list: for each top card, the weakest kicker you play."},
+  {h:"The small blind: tighter, and bigger",p:"<p>The small blind has one player left but plays out of position, so it opens fewer hands and raises to 6 instead of 5. Offsuit hands need high cards (K7o+, Q9o+, J9o+). Weak offsuit connectors like 65o fold: out of position they rarely make enough to win.</p>",chart:"SB"},
+  {h:"Earlier seats: tighten up",p:"<p>From the cutoff, three players are behind you and the button has position on you, so the range drops to about a third of hands. Every seat earlier than that drops again.</p><p>The hands that go first are the weak offsuit ones. On the button K8o is a raise. From the cutoff it makes a top pair that a better king beats too often.</p>",chart:"CO"}]},
+ {id:"bb",unit:0,t:"Defending the big blind",quiz:{topic:"Big blind defense",n:8,pass:6},pages:[
+  {h:"You get a discount",p:"<p>You have already posted 2. Against a raise to 5 you pay 3 more to play for a pot of 11, so you need to win only about 27% of the time. You also act last before the flop, so nobody can raise behind you.</p><p>That price is why the big blind defends more hands than any other seat calls with.</p>",
+   tip:"The 2 you posted is already in the pot. Only the 3 more matters."},
+  {h:"The earlier the raiser, the tighter you defend",p:"<p>A button raise is made with half of all hands. A raise from an early seat is made with the best 12%. Your hand has to do well against the hands they actually hold.</p>",
+   rows:function(){return [pctRow("Against a button raise","BBvBTN"),pctRow("Against a small-blind raise","BBvSB"),pctRow("Against a cutoff raise","BBvCO"),pctRow("Against a hijack or lojack raise","BBvMID"),pctRow("Against an earlier raise","BBvEP"),pctRow("Heads-up","BBHU")];}},
+  {h:"What you defend against the button",p:"<p>Every suited hand, every pair, any ace, and offsuit hands down to K5o, Q8o, J8o, T8o, 98o and 87o. Weak offsuit hands like K2o or 95o fold even at this price, because out of position they rarely get to showdown.</p>",chart:"BBvBTN"},
+  {h:"When to re-raise instead of calling",p:"<p>Re-raise to 16 with the hands that are ahead of the raiser’s range. Call with the rest of your defending hands.</p>",
+   rows:[["Against a cutoff, button or small-blind raise","JJ+, AK, AQ"],["Against a hijack, lojack or earlier raise","QQ+, AK"],["Heads-up","99+, AQ+"]],
+   tip:"A re-raise builds the pot while you are ahead and takes the lead, so you are not just the caller out of position."}]},
+ {id:"vsraise",unit:0,t:"Facing a raise",quiz:{topic:"Facing a raise",n:8,pass:6,need3:true},pages:[
+  {h:"Calling needs a better hand than raising",p:"<p>When someone has already raised, a strong range is in the pot. A hand you would happily open yourself can now be a fold.</p><p>You have three plays: re-raise the hands that are ahead of the raiser, call the hands that can flop something big, and fold the rest.</p>"},
+  {h:"Re-raise: which hands, how much",p:"<p>Re-raise to about 3 times their raise, and a little bigger from the small blind, where you will be out of position.</p>",
+   rows:function(){return guideRows("Re-raising a raise (3-bet)").slice(0,5);},
+   tip:"Hands like TT or AJs are usually calls. A re-raise folds out the worse hands and keeps in the better ones."},
+  {h:"Call: hands that flop big",p:"<p><b>In position</b>, call with the other pairs (to hit a set), suited broadway cards, any suited ace, suited connectors from 54s to T9s, and AQo. Against a cutoff raise, also AJo and KQo.</p><p><b>From the small blind</b>, drop the speculative suited hands: call with pairs, suited broadway and AQo. Against a cutoff or button raise, also AJo and KQo.</p>",chart:"CCL"},
+  {h:"Fold: the hands that look good",p:"<p>A9o, KTo and QJo look playable, and they are the most expensive calls in poker. They make top pair with the second-best kicker, so when the money goes in after the flop you are usually the one paying.</p>",
+   tip:"If your hand’s best result is top pair with a weak kicker, fold it to a raise."}]},
+ {id:"limps",unit:0,t:"Punishing limpers",quiz:{topic:"Facing limps",n:8,pass:6},pages:[
+  {h:"A limp is a weak hand",p:"<p>Players raise their best hands, so a limper rarely has one. Raising your strong hands over a limp builds the pot while you are ahead and usually gets you heads-up with the lead.</p>",
+   rows:function(){return guideRows("Raising over limpers");},tip:"Go bigger than a normal raise. Limpers love to call."},
+  {h:"What to do in each seat",p:"<p><b>Big blind:</b> raise the strong hands, check everything else. Never fold when checking is free.</p><p><b>Small blind:</b> raise the strong hands. With small pairs and suited connectors, completing for 1 more or folding are both fine. Fold the rest.</p><p><b>With position on the limper:</b> raise the strong hands, limp behind with small pairs, suited connectors and one-gappers, fold the rest.</p>"},
+  {h:"Don’t raise weak hands to isolate",p:"<p>Callers with medium hands hit the flop often. If you raise K7o to isolate a limper and get called, you are playing a bloated pot with a hand that makes second-best pairs.</p><p>Speculative hands are the opposite: they want a cheap, multiway pot, where a set or a flush gets paid by several players.</p>"}]},
+ {id:"vs3bet",unit:0,t:"When they re-raise you",quiz:{topic:"Facing 3-bets",n:8,pass:6},pages:[
+  {h:"Judge your hand against their range",p:"<p>Home-game players re-raise with a narrow range: roughly QQ+, AK, AQ and JJ. Your opening hand now has to do well against <i>those</i> hands, not against a random one.</p>",
+   rows:function(){return guideRows("When they re-raise you (4-bet or not)").slice(0,4);}},
+  {h:"The 1/10 rule for small pairs",p:"<p>A small pair or a suited connector flops a big hand only about 1 time in 6 to 8. To profit you must win about 10 times the call when you hit.</p><p>So call only when the call is at most 1/10 of the stacks: about 20 with 200 behind. If it costs more, fold.</p>",
+   tip:"Cost 20 or less: call and try to flop a set. More: fold."},
+  {h:"The 5 you already put in is gone",p:"<p>The most common mistake here is calling because you already raised. That money belongs to the pot now. The only question is whether the next call makes money, and with AJo or KQo against QQ+, AK and AQ it does not.</p>"}]},
+ {id:"odds",unit:1,t:"Pot odds",quiz:{topic:"Pot odds",n:8,pass:7},pages:[
+  {h:"What a call has to earn",p:"<p>When you call, you risk the bet to win everything in the middle, including your own call.</p><p><b>Equity you need = call ÷ (pot + bet + call).</b></p><p>Example: the pot is 60 and they bet 30. You call 30 to win 120, so you need 30 ÷ 120 = 25%.</p>"},
+  {h:"Memorize the prices",p:"<p>Every bet size has a fixed price. Learn them once and stop calculating at the table.</p>",
+   rows:[["1/4 pot","17%"],["1/3 pot","20%"],["1/2 pot","25%"],["2/3 pot","29%"],["3/4 pot","30%"],["Pot","33%"]],tip:"Half pot needs a quarter. Pot needs a third."},
+  {h:"The bluffer’s side",p:"<p>A bluff risks the bet to win the pot. It breaks even when they fold <b>bet ÷ (pot + bet)</b> of the time.</p>",
+   rows:[["1/3 pot","25%"],["1/2 pot","33%"],["2/3 pot","40%"],["Pot","50%"]],
+   tip:"Small bluffs need to work less often. That is why a small bet on a dry flop is profitable, and why bluffing a player who never folds is not."}]},
+ {id:"draws",unit:1,t:"Draws: outs and equity",quiz:{topic:"Draws & equity",n:8,pass:6},pages:[
+  {h:"Count your outs",p:"<p>An out is a card that makes your hand.</p>",
+   rows:[["Flush draw","9 outs"],["Open-ended straight draw","8 outs"],["Gutshot","4 outs"],["Flush draw + open-ended","15 outs"],["Two overcards","6 outs"]]},
+  {h:"Turn outs into equity",p:"<p>With <b>one card to come</b>, multiply your outs by 2. A flush draw on the turn is about 18%.</p><p>On the flop, multiply by 4 <b>only when you will see both cards for one price</b>, which means the opponent is all-in. If they can bet again on the turn, your flop call buys one card, so use 2.</p>",
+   tip:"×2 for one card. ×4 only when they are all-in on the flop."},
+  {h:"Compare equity with the price",p:"<p>Call when your equity is higher than the price from the last lesson.</p><p>Example: on the turn you have a flush draw (18%) and they bet half the pot (25% needed). Fold. If they bet a quarter of the pot (17% needed), call.</p><p>Money you expect to win later when you hit can justify a slightly worse price, but only against players who pay off.</p>"}]},
+ {id:"cbet",unit:2,t:"Betting the flop after you raised",quiz:{topic:"Flop c-bets",n:8,pass:6,test:function(g){return !g.mw;}},pages:[
+  {h:"Read the board first: wet or dry",p:"<p>A <b>dry</b> board has few draws: K-7-2 with three suits. Whoever is ahead now usually stays ahead.</p><p>A <b>wet</b> board has draws: three cards of one suit, three cards close in rank like 9-8-6, or two of a suit with two cards close together. Many turn cards change who is winning.</p>",
+   tip:"Dry board: bet small. Wet board: bet big or check."},
+  {h:"What each hand does",p:"<p>Against one caller:</p>",rows:function(){return guideRows("Betting the flop after you raised").slice(2,7);}},
+  {h:"Why weak pairs check",p:"<p>With 77 on K-J-6, a bet folds out the hands you beat and gets called only by kings and jacks. You turned a hand with showdown value into a bluff.</p><p>Check it. You keep the pot small, see the turn for free, and often win at showdown.</p>",
+   tip:"Bet for value when worse hands call. Bluff when better hands fold. Check when neither is true."}]},
+ {id:"multiway",unit:2,t:"Pots with two callers",quiz:{topic:"Flop c-bets",n:6,pass:5,need3:true,test:function(g){return g.mw;}},pages:[
+  {h:"Two callers changes everything",p:"<p>In your game most raised pots have more than one caller. With two opponents it is twice as likely that someone hit the flop, and a bluff has to get through both of them.</p>"},
+  {h:"The rule: no bluffs, no thin bets",p:"<p>Against two callers, bet only top pair or better.</p>",
+   rows:[["Two pair or better","Bet: big on wet boards, either size on dry"],["Top pair or overpair","Bet: small on dry, big on wet"],["Second pair or weaker","Check"],["Nothing","Check, even on a dry board"]],
+   tip:"The more players see the flop, the stronger the hand you need to bet."}]},
+ {id:"river",unit:2,t:"Big river bets and one pair",quiz:{topic:"River vs big bets",n:8,pass:6,test:function(g){return g.kind==="top"||g.kind==="two";}},pages:[
+  {h:"Top pair wins small pots",p:"<p>This is the most expensive habit in home games: calling big bets on every street because “it’s top pair.”</p><p>By the river, a player who bet big three times is telling you something. Big pots are usually won by two pair or better.</p>"},
+  {h:"List the worse hands that bet this way",p:"<p>Before you call, name the hands you beat that would bet big on the flop, the turn and the river. Against a solid player who rarely bluffs, the list is almost empty: they have two pair, a set, or a straight.</p>",
+   rows:[["Solid player, big bets on three streets","Fold top pair"],["Same player, you have top two pair","Call"],["A player who has shown bluffs","Call top pair"],["A small river bet","Call top pair: the price is great"]]},
+  {h:"Who is betting matters most",p:"<p>A friend who usually just calls and suddenly bets or raises big almost always has it. Passive players do not turn into bluffers on the river.</p><p>A friend who has shown two bluffs tonight is a different opponent. Against them top pair beats enough of their range to call.</p>",
+   tip:"The same hand is a fold against one player and a call against another. Decide who you are facing before you look at the price."}]},
+ {id:"riverraise",unit:2,t:"Getting paid with strong hands",quiz:{topic:"River vs big bets",n:6,pass:5,test:function(g){return g.kind==="set"||(g.kind==="two"&&g.vil!=="solid");}},pages:[
+  {h:"Raise when worse hands will call",p:"<p>A river raise is for hands that beat most of what calls it. A set usually qualifies: worse two pairs and smaller sets pay you.</p>",rows:function(){return guideRows("Raising a river bet");}},
+  {h:"Check for the straight first",p:"<p>Look at the board for three cards that fit inside a five-card run, like 9-7-6 or A-4-3. If a straight is possible and a solid player has bet big on every street, just call with a set: a raise gets called only by the straight.</p><p>Wheels are the ones people miss. On A-4-3, a player holding 5-2 has a straight.</p>",
+   tip:"Set + no straight possible: raise. Set + straight possible + solid player: call."}]},
+ {id:"shove",unit:3,t:"Short stacks: shove or fold",quiz:{topic:"All-in decisions",n:8,pass:6,test:function(g){return !!g.rkey;}},pages:[
+  {h:"With 6 to 12 big blinds, there are two plays",p:"<p>A normal raise puts in a big part of a short stack and leaves you unable to fold to a re-raise. So below about 12 big blinds you either move all-in or fold.</p><p>A shove wins two ways: everyone folds and you take the blinds, or you get called and win the showdown.</p>"},
+  {h:"How wide to shove from each seat",p:"<p>The fewer players behind you, the wider you shove.</p>",rows:function(){return guideRows("Short stack (6-12 big blinds)").slice(1);},
+   tip:"Never min-raise and fold, and never limp, when you are short."}]},
+ {id:"callshove",unit:3,t:"Calling an all-in",quiz:{topic:"All-in decisions",n:8,pass:6,test:function(g){return !g.rkey;}},pages:[
+  {h:"Before the flop: who is shoving?",p:"<p>Calling a 100 big blind shove needs about 49% equity, a coin flip. Whether your hand has that depends on the hands this player shoves with.</p>",
+   rows:[["A tight player (QQ+, AK)","Call only AA and KK"],["A typical player (TT+, AQ+)","Call QQ+ and AK"],["A maniac","Call much lighter: 99+, AJ+"]],
+   tip:"QQ and AK are folds against a tight player’s shove. They are a coin flip or worse against that range."},
+  {h:"After the flop: how deep are the stacks?",p:"<p>Divide the stack left by the pot. That is the stack-to-pot ratio.</p>",
+   rows:[["About 1 or less","Top pair is enough to call"],["3 or more, against a solid player","Two pair or better"],["3 or more, against a maniac","Top pair can still call"]],
+   tip:"The deeper the stacks, the stronger the hand you need to put them all in."}]},
+ {id:"adapt",unit:4,t:"Adjusting to each player",quiz:{topic:"Adaptation",n:8,pass:6},pages:[
+  {h:"Three adjustments cover most players",p:"<p>Every rule so far is a starting point. The money comes from changing your play to fit the person in front of you.</p>",
+   rows:[["They fold too much","Bluff and steal more"],["They bluff too much","Call more"],["They call too much","Value bet more, bluff less"]]},
+  {h:"Your friends adjust to you too",p:"<p>If you have folded all night, your raises get respect: steal more blinds and fire more small bets. If you have been caught bluffing, they will call you lighter: bet your good hands bigger and bluff less.</p><p>Watch for players who play differently against you than against others. That is someone who has adapted, and they usually overdo it.</p>",
+   tip:"Adjust to how a player plays against you tonight, not to how they played last month."}]},
+ {id:"value",unit:4,t:"Value betting players who call too much",quiz:{topic:"Adaptation",n:6,pass:5,test:function(g){return /^(thin|size|check|bluff)\|/.test(g.sk);}},pages:[
+  {h:"Where the money is in your game",p:"<p>Friends who limp and call a lot do not fold to bluffs, and they pay off value bets. So bluff them less, and bet your good hands more often and bigger.</p><p>On the river with top pair, ask one question: will a worse hand call? Against a player who calls with any pair, bet. Against a tight player who only calls with two pair or better, check and show it down.</p>",
+   tip:"Being ahead is not enough to bet. A worse hand has to call."},
+  {h:"Pick the size they will call",p:"<p>Against someone who calls any size, bet big. Against someone who folds to big bets but calls small ones, bet small: a small bet that gets called beats a big bet that does not.</p>"},
+  {h:"Let aggressive players bet for you",p:"<p>With a strong hand against a player who bets every time you check, check and then raise to about 3 times their bet. Against a passive player who checks back, bet yourself: they will not do it for you.</p>"}]}
+];
+function lessonById(id){for(var i=0;i<LESSONS.length;i++)if(LESSONS[i].id===id)return LESSONS[i];return null;}
+/* Table sizes a lesson's quiz can use, from the sizes being practiced. */
+function lessonSizes(L,sizes){var fm=G[L.quiz.topic].fmts;if(!fm)return [null];return fm.filter(function(f){return sizes.indexOf(f)>=0&&!(L.quiz.need3&&f==="2");});}
+function lessonSpot(L,f){
+  var q=L.quiz;
+  for(var i=0;i<3000;i++){var g=G[q.topic].gen(f);if(g&&(!q.test||q.test(g))){g.topic=q.topic;g.fm=f;return g;}}
+  return null;
+}
+
 /* ===================== Skills ===================== */
 /* A skill is the piece of knowledge a spot tests: a seat's chart, a hand class on a board texture, a pot-odds
    fraction. Reviews ask the same skill again with new cards, so you learn the rule, not the one hand. */
@@ -1245,7 +1400,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"3.0.0",at:"2026-11-11T17:18Z"};
+var BUILD={v:"2.2.0",at:"2026-11-12T03:24Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1326,6 +1481,7 @@ function explHTML(g,ok){
 }
 function drillBar(){
   if(!focus)return "";
+  if(focus.q)return '<div class="drillbar"><span>'+lessonById(focus.q).t+'<small>Quiz · spot '+Math.min(focus.i+(picked===null?1:0),focus.n)+' of '+focus.n+' · '+focus.ok+' right</small></span><span class="dbtns"><button class="chip small" data-act="stopdrill">Quit</button></span></div>';
   return '<div class="drillbar"><span>Drilling: '+(focus.t?focus.t:cap(RSPEC[focus.k].desc)+' · '+FN[focus.f])+'</span><span class="dbtns">'+
     '<button class="chip small" data-act="tocharts">'+(focus.t?'Back':'Chart')+'</button><button class="chip small" data-act="stopdrill">Stop</button></span></div>';
 }
@@ -1356,9 +1512,58 @@ function renderGuide(){
       '<button class="btn ldrill" data-tdrill="'+x.drill+'"'+(av?'':' disabled')+'>Drill: '+x.drill+'</button></div></details>';});
   return h;
 }
+/* ----- Lessons: the list, the reader, the quiz result ----- */
+var les=null; /* the open lesson: {id, page} while reading, {id, result:{ok,n}} after its quiz */
+function lesState(id){return (st.les&&st.les[id])||{};}
+function lesQuizSizes(L){return lessonSizes(L,FMTS.filter(inRange));}
+function nextLesson(){for(var i=0;i<LESSONS.length;i++)if(!lesState(LESSONS[i].id).pass)return LESSONS[i];return null;}
+function renderLessonList(){
+  var done=LESSONS.filter(function(L){return lesState(L.id).pass;}).length,nx=nextLesson();
+  var h='<div class="lprog"><div><b>'+done+' of '+LESSONS.length+'</b> lessons passed</div><span class="bar"><i style="width:'+Math.round(done/LESSONS.length*100)+'%"></i></span></div>';
+  if(nx)h+='<button class="lnext" data-lesson="'+nx.id+'"><span><small>'+(done?'Up next':'Start here')+'</small><b>'+nx.t+'</b></span><span class="go">'+(lesState(nx.id).page?'Continue':'Start')+'</span></button>';
+  else h+='<p class="lead">You have passed every lesson. Retake any quiz to keep it sharp.</p>';
+  var n=0;
+  UNITS.forEach(function(u,ui){
+    h+='<div class="sec">'+u+'</div>';
+    LESSONS.filter(function(L){return L.unit===ui;}).forEach(function(L){n++;var x=lesState(L.id);
+      h+='<button class="lrow'+(x.pass?' pass':'')+'" data-lesson="'+L.id+'"><span class="lnum">'+(x.pass?'✓':n)+'</span><span class="lt"><b>'+L.t+'</b><small>'+
+        (x.best!==undefined?'Best '+x.best+' of '+L.quiz.n+(x.pass?'':' · pass with '+L.quiz.pass):L.pages.length+' pages · quiz of '+L.quiz.n)+'</small></span>'+CHEV+'</button>';});
+  });
+  return h;
+}
+function renderLessonPage(){
+  var L=lessonById(les.id),x=lesState(L.id);
+  if(les.result){var r=les.result,ok=r.ok>=L.quiz.pass,nx=nextLesson();
+    return '<div class="lres '+(ok?'good':'bad')+'"><small>'+L.t+'</small><b>'+r.ok+' of '+r.n+'</b><p>'+(ok?'Passed. '+(r.ok===r.n?'A perfect quiz.':'The spots you missed will come back in Practice.'):'Not yet: you need '+L.quiz.pass+' to pass. The spots you missed will come back in Practice.')+'</p></div>'+
+      (ok&&nx?'<button class="btn" data-lesson="'+nx.id+'">Next lesson: '+nx.t+'</button>':'')+
+      '<button class="btn'+(ok&&nx?' alt':'')+'" data-act="lquiz">'+(ok?'Take the quiz again':'Try the quiz again')+'</button>'+
+      '<button class="btn alt" data-act="lread">Read the lesson again</button><button class="btn alt" data-act="lclose">All lessons</button>';}
+  var k=Math.min(les.page||0,L.pages.length-1),pg=L.pages[k],last=k===L.pages.length-1,sizes=lesQuizSizes(L);
+  var rows=typeof pg.rows==="function"?pg.rows():pg.rows;
+  var h='<div class="lbar"><button class="chip small" data-act="lclose">‹ Lessons</button><span>'+(k+1)+' of '+L.pages.length+'</span></div>'+
+    '<div class="ldots" aria-hidden="true">'+L.pages.map(function(_,i){return '<i class="'+(i<=k?'on':'')+'"></i>';}).join("")+'</div>'+
+    '<article class="lpage"><small>'+L.t+'</small><h2>'+pg.h+'</h2>'+color(pg.p)+
+    (rows&&rows.length?'<div class="gtable">'+rows.map(function(r){return '<div><span>'+r[0]+'</span><b>'+r[1]+'</b></div>';}).join("")+'</div>':'')+
+    (pg.chart?rangeGrid(pg.chart,"")+'<p class="muted small" style="margin-top:8px">'+color(rangeText(pg.chart))+'</p>':'')+
+    (pg.tip?'<div class="ltip"><span>Remember</span>'+pg.tip+'</div>':'')+'</article>';
+  h+='<div class="lnav">'+(k>0?'<button class="btn alt" data-act="lprev">Back</button>':'')+
+    (last?'<button class="btn" data-act="lquiz"'+(sizes.length?'':' disabled')+'>Start the quiz · '+L.quiz.n+' spots</button>':'<button class="btn" data-act="lnextpage">Next</button>')+'</div>';
+  if(last)h+='<p class="muted small" style="text-align:center;margin-top:8px">'+(sizes.length?'Pass with '+L.quiz.pass+' of '+L.quiz.n+'.'+(x.best!==undefined?' Your best: '+x.best+'.':''):'This quiz needs a table of three or more. Change the table size in Settings.')+'</p>';
+  return h;
+}
+function startQuiz(id){var L=lessonById(id);focus={q:id,i:0,ok:0,n:L.quiz.n};view="practice";next();}
+function finishQuiz(){
+  var L=lessonById(focus.q),r={ok:focus.ok,n:focus.n},x=lesState(L.id);
+  st.les=st.les||{};st.les[L.id]={best:Math.max(x.best===undefined?0:x.best,r.ok),pass:!!x.pass||r.ok>=L.quiz.pass,page:0};
+  les={id:L.id,result:r};focus=null;cur=null;picked=null;st.lv="lessons";save();setView("learn");
+}
+/* Next button and Enter: the next spot, or the result after the last quiz spot. */
+function advance(){if(focus&&focus.q&&focus.i>=focus.n)finishQuiz();else next();}
 function renderLearn(){
-  var lv=st.lv==="raise"?"raise":"ranges";
-  var tabs='<div class="lsizes ltabs" role="group" aria-label="What to study" style="grid-template-columns:1fr 1fr"><button class="seg" data-lv="ranges" aria-pressed="'+(lv==="ranges")+'">Ranges</button><button class="seg" data-lv="raise" aria-pressed="'+(lv==="raise")+'">Raising</button></div>';
+  var lv=st.lv==="raise"||st.lv==="ranges"?st.lv:"lessons";
+  if(lv==="lessons"&&les)return renderLessonPage();
+  var tabs='<div class="lsizes ltabs" role="group" aria-label="What to study" style="grid-template-columns:1fr 1fr 1fr">'+[["lessons","Lessons"],["ranges","Ranges"],["raise","Raising"]].map(function(x){return '<button class="seg" data-lv="'+x[0]+'" aria-pressed="'+(lv===x[0])+'">'+x[1]+'</button>';}).join("")+'</div>';
+  if(lv==="lessons")return tabs+renderLessonList();
   if(lv==="raise")return tabs+renderGuide();
   var sizes=FMTS.filter(inRange);if(sizes.indexOf(st.lf)<0)st.lf=sizes[0];
   var f=st.lf,h=tabs+'<p class="lead">Every preflop chart for one table size. Open a chart to study it, then drill it until the edges stick.</p>';
@@ -1402,7 +1607,7 @@ function renderSettings(){
   h+='<div class="sec">Topics <span class="count">'+onCount+' of '+TOPICS.length+' on</span></div><div class="chips" style="margin-bottom:8px"><button class="chip small" data-act="all">Select all</button><button class="chip small" data-act="none">Clear</button></div>'+
     '<div class="chips">'+TOPICS.map(function(t){var av=available(t);return '<button class="chip" data-topic="'+t+'" aria-pressed="'+(!!st.on[t]&&av)+'"'+(av?'':' disabled title="Not available for the selected table sizes"')+'>'+t+'</button>';}).join("")+'</div>';
   h+='<div class="sec">Appearance and sound</div><div class="group">'+tgl("dark",dk,"Dark mode","",th==="auto")+tgl("auto",th==="auto","Match device","Follow your phone’s light or dark setting.")+tgl("sound",st.sound!==false,"Sound","Cards and chips: fold, check, call, raise and all-in each have their own sound.")+'</div>';
-  h+='<div class="sec">Your data</div><p class="muted small">Stats and reviews are saved on this phone only.</p><button class="btn alt" data-act="reset">Reset all stats</button>';
+  h+='<div class="sec">Your data</div><p class="muted small">Stats, reviews and lesson progress are saved on this phone only.</p><button class="btn alt" data-act="reset">Reset all stats</button>';
   h+='<p class="muted small ver">Blinds 1/2 · 200-chip stacks unless stated<br>'+buildText()+'</p>';
   return h;
 }
@@ -1415,6 +1620,7 @@ function render(){
   $("page").innerHTML=view==="practice"?renderQ():view==="learn"?renderLearn():view==="progress"?renderProgress():renderSettings();
   var nb=$("nav").children;for(var i=0;i<nb.length;i++){if(nb[i].dataset.nav===view)nb[i].setAttribute("aria-current","page");else nb[i].removeAttribute("aria-current");}
   $("bar").hidden=!(view==="practice"&&cur&&picked!==null);
+  $("nextbtn").textContent=focus&&focus.q&&focus.i>=focus.n?"See your result →":"Next spot →";
   tsPaint(st.lo,st.hi);
 }
 function setView(v){
@@ -1450,7 +1656,8 @@ function next(){
   if(!on.length&&!focus){cur=null;picked=null;render();return;}
   var g=null;
   /* A drill deals from one chart (started in Learn) or one topic (started in Progress) until you stop it. */
-  if(focus&&focus.t){var ff=G[focus.t].fmts?pick(G[focus.t].fmts.filter(inRange)):null;for(var q=0;q<40&&!g;q++)g=G[focus.t].gen(ff);if(g){g.topic=focus.t;g.fm=ff;g.drill=true;}}
+  if(focus&&focus.q){var QL=lessonById(focus.q),qs=lesQuizSizes(QL);if(qs.length)g=lessonSpot(QL,pick(qs));if(g)g.drill=true;}
+  else if(focus&&focus.t){var ff=G[focus.t].fmts?pick(G[focus.t].fmts.filter(inRange)):null;for(var q=0;q<40&&!g;q++)g=G[focus.t].gen(ff);if(g){g.topic=focus.t;g.fm=ff;g.drill=true;}}
   else if(focus){g=drillSpot(focus.k,focus.f);if(g)g.drill=true;}
   if(focus&&!g)focus=null;
   if(!g&&!on.length){cur=null;picked=null;render();return;}
@@ -1535,6 +1742,7 @@ function answer(i){
     st.miss.push({topic:cur.topic,tag:cur.f?FN[cur.f]:cur.tag,hand:cur.hand?cur.hand.map(cs).join(" "):"",board:cur.board?cur.board.map(cs).join(" "):"",act:cur.act||"",
       ans:cur.o.filter(function(o){return o.ok;}).map(function(o){return o.t;}).join(" or "),e:cur.e});
     if(st.miss.length>20)st.miss.shift();}
+  if(focus&&focus.q){focus.i++;if(ok)focus.ok++;}
   save();render();
   var x=document.querySelector(".verdict");if(x&&x.scrollIntoView)x.scrollIntoView({block:"nearest",behavior:"smooth"});
 }
@@ -1583,18 +1791,23 @@ document.addEventListener("click",function(e){
   if(b.dataset.topic){st.on[b.dataset.topic]=!st.on[b.dataset.topic];save();render();return;}
   if(b.dataset.i!==undefined){answer(+b.dataset.i);return;}
   if(b.dataset.lf){st.lf=b.dataset.lf;save();render();return;}
-  if(b.dataset.lv){st.lv=b.dataset.lv;save();render();try{window.scrollTo(0,0);}catch(e3){}return;}
+  if(b.dataset.lv){st.lv=b.dataset.lv;les=null;save();render();try{window.scrollTo(0,0);}catch(e3){}return;}
   if(b.dataset.drill){focus={k:b.dataset.drill,f:b.dataset.f};view="practice";next();return;}
   if(b.dataset.tdrill){focus={t:b.dataset.tdrill,from:view};view="practice";next();return;}
   var a=b.dataset.act;
-  if(a==="stopdrill"){focus=null;next();return;}
+  if(b.dataset.lesson){les={id:b.dataset.lesson,page:lesState(b.dataset.lesson).page||0};st.lv="lessons";render();try{window.scrollTo(0,0);}catch(e4){}return;}
+  if(a==="lclose"){les=null;render();try{window.scrollTo(0,0);}catch(e5){}return;}
+  if(a==="lread"){les={id:les.id,page:0};render();try{window.scrollTo(0,0);}catch(e6){}return;}
+  if(a==="lprev"||a==="lnextpage"){les.page=(les.page||0)+(a==="lprev"?-1:1);st.les=st.les||{};var lx=st.les[les.id]=lesState(les.id);lx.page=les.page;save();render();try{window.scrollTo(0,0);}catch(e7){}return;}
+  if(a==="lquiz"){startQuiz(les.id);return;}
+  if(a==="stopdrill"){if(focus&&focus.q){les={id:focus.q,page:0};focus=null;cur=null;picked=null;st.lv="lessons";setView("learn");return;}focus=null;next();return;}
   if(a==="tocharts"){setView(focus&&focus.from||"learn");return;}
   if(a==="size"){$("sheet").hidden=false;return;}
   if(a==="close"){$("sheet").hidden=true;return;}
-  if(a==="next")next();
+  if(a==="next")advance();
   else if(a==="all"||a==="none"){TOPICS.forEach(function(t){st.on[t]=a==="all";});save();render();}
   else if(a==="clearmiss"){st.miss=[];save();render();}
-  else if(a==="reset"){if(!confirm("Reset all your stats?"))return;st.n=0;st.c=0;st.streak=0;st.bestStreak=0;st.miss=[];st.rev={};st.mastered=0;TOPICS.forEach(function(t){st.by[t]=[0,0];st.ew[t]=.5;});save();render();}
+  else if(a==="reset"){if(!confirm("Reset all your stats?"))return;st.n=0;st.c=0;st.streak=0;st.bestStreak=0;st.miss=[];st.rev={};st.mastered=0;st.les={};TOPICS.forEach(function(t){st.by[t]=[0,0];st.ew[t]=.5;});save();render();}
 });
 document.addEventListener("toggle",function(e){
   var d=e.target;if(!d||!d.dataset||!d.dataset.lk)return;
@@ -1605,7 +1818,7 @@ document.addEventListener("keydown",function(e){
   if(view!=="practice"||!$("sheet").hidden)return;
   var tg=e.target&&e.target.tagName;if(tg==="SUMMARY"||tg==="INPUT")return;
   if(picked===null&&cur&&/^[1-4]$/.test(e.key)){var i=+e.key-1;if(i<cur.o.length)answer(i);}
-  else if(cur&&picked!==null&&(e.key==="Enter"||e.key===" "||e.key==="ArrowRight")){e.preventDefault();next();}
+  else if(cur&&picked!==null&&(e.key==="Enter"||e.key===" "||e.key==="ArrowRight")){e.preventDefault();advance();}
 });
 var applying=false;
 function applyTheme(){

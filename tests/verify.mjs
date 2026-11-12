@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnNote,drillSpot,RAISE_GUIDE,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -195,6 +195,23 @@ gen("Preflop opens", "4", 200, g => ok(g.o.some(o => o.t === (g.you === "SB" ? "
 gen("Facing a raise", "6", 200, g => ok(g.o[0].t === (g.you === "SB" ? "Re-raise to 18" : "Re-raise to 15") && /Re-raise to 15/.test(gtxt) && /Re-raise to 18/.test(gtxt), "raising guide: re-raise sizes"));
 gen("Big blind defense", "4", 200, g => { if (Object.keys(g.sub)[0] !== "SB") ok(g.o[0].t === "Re-raise to 16" && /Re-raise to 16/.test(gtxt), "raising guide: big blind re-raise size"); });
 for (const [k, pct] of [["PUSHEP", 11], ["PUSHMID", 15], ["PUSHCO", 21], ["PUSHBTN", 38], ["PUSHHU", 58]]) ok(X.chartPct(X.CH[k]) === pct && gtxt.includes("About " + pct + "%"), `raising guide: shove share for ${k}`);
+
+// 14. Lessons: every lesson has pages, and its quiz can deal enough matching spots at every table size it allows
+ok(new Set(X.LESSONS.map(L => L.id)).size === X.LESSONS.length && X.LESSONS.every(L => X.UNITS[L.unit]), "lessons: ids are unique and every lesson has a unit");
+for (const L of X.LESSONS) {
+  ok(L.pages.length >= 2 && L.pages.every(pg => pg.h && pg.p && (!pg.chart || X.RSPEC[pg.chart])), `lesson ${L.id}: every page needs a heading and text`);
+  for (const pg of L.pages) { const rows = typeof pg.rows === "function" ? pg.rows() : pg.rows || [];
+    ok(rows.every(r => r.length === 2 && r[0] && r[1] && !/undefined|NaN/.test(r.join())), `lesson ${L.id}: broken table on "${pg.h}"`);
+    if (typeof pg.rows === "function") ok(rows.length >= 2, `lesson ${L.id}: empty table on "${pg.h}"`); }
+  ok(X.G[L.quiz.topic] && L.quiz.pass <= L.quiz.n && L.quiz.pass >= L.quiz.n / 2, `lesson ${L.id}: bad quiz settings`);
+  const sizes = X.lessonSizes(L, X.FMTS);
+  ok(sizes.length > 0 && (!L.quiz.need3 || !sizes.includes("2")), `lesson ${L.id}: no table size for its quiz`);
+  for (const f of sizes) for (let i = 0; i < 4; i++) {
+    const t0 = Date.now(), g = X.lessonSpot(L, f);
+    ok(g && (!L.quiz.test || L.quiz.test(g)) && g.topic === L.quiz.topic, `lesson ${L.id}: no quiz spot at ${f}`);
+    ok(Date.now() - t0 < 500, `lesson ${L.id}: quiz spot at ${f} is slow`);
+  }
+}
 
 // 10. The version shown in the app must match the service worker cache
 const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-(\d+\.\d+\.\d+)"/);
