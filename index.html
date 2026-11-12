@@ -178,6 +178,7 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .lcard summary::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-left:4px}
 .lcard[open] summary::after{transform:rotate(-135deg)}
 .lcard summary span{flex:1}
+.lcard summary small{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin-top:2px}
 .lcard summary b{font-family:var(--serif);color:var(--gold)}
 .lbody{padding:0 14px 14px}
 .lbody .es:first-child{margin-top:0}
@@ -1222,6 +1223,26 @@ function learnGroups(f){
   var push=uniq(seats.slice(0,-1).map(function(s){return pushKey(f,s);}));
   return [{t:"Opening (everyone before you folded)",keys:opens},{t:"Big blind defense (one raise)",keys:bb},{t:"Facing a raise (not in the big blind)",keys:uniq(cc)},{t:"Short stack (6-12 big blinds)",keys:push}];
 }
+/* The Ranges cheat sheet lists every chart once, whatever table size is set: a seat's range depends on how many
+   players are left to act, not on how many sat down. keySizes(k) says at which table sizes a chart comes up. */
+function keySizes(k){return FMTS.filter(function(f){return learnGroups(f).some(function(g){return g.keys.indexOf(k)>=0;});});}
+function sizesText(fs){
+  if(fs.length===FMTS.length)return "every table size";
+  var a=+fs[0],b=+fs[fs.length-1],nm=function(n){return n===2?"heads-up":n+"-handed";};
+  return a===b?nm(a)+" only":b===9?nm(a)+" and bigger":nm(a)+" to "+nm(b);
+}
+function learnAll(){
+  var gs=[{t:"Opening (everyone before you folded)",keys:["UTG","UTG1","MP","LJ","HJ","CO","BTN","SB","BTNHU"]},
+    {t:"Big blind defense (one raise)",keys:["BBvEP","BBvMID","BBvCO","BBvBTN","BBvSB","BBHU"]},
+    {t:"Facing a raise (not in the big blind)",keys:["CCE","CCL","CCSBE","CCSBL"]},
+    {t:"Short stack (6-12 big blinds)",keys:["PUSHEP","PUSHMID","PUSHCO","PUSHBTN","PUSHHU"]}];
+  return gs;
+}
+/* One line under each chart title: who is left behind you (openings), and where the chart comes up. */
+function keySub(k){
+  var n=BEHIND[k],fs=keySizes(k);
+  return (RSPEC[k].verb==="open"&&k!=="BTNHU"?NUM[n]+" player"+(n>1?"s":"")+" left to act · ":k==="BTNHU"?"one player left, and you have position · ":"")+cap(sizesText(fs)).replace(/^./,function(c){return c.toLowerCase();});
+}
 function learnNote(k){
   var sp=RSPEC[k];
   if(sp.verb==="open")return seatNote(k);
@@ -1407,7 +1428,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.2.3",at:"2026-11-12T03:41Z"};
+var BUILD={v:"2.2.4",at:"2026-11-12T08:02Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1573,15 +1594,13 @@ function renderLearn(){
   var tabs='<div class="lsizes ltabs" role="group" aria-label="What to study" style="grid-template-columns:1fr 1fr 1fr">'+[["lessons","Lessons"],["ranges","Ranges"],["raise","Raising"]].map(function(x){return '<button class="seg" data-lv="'+x[0]+'" aria-pressed="'+(lv===x[0])+'">'+x[1]+'</button>';}).join("")+'</div>';
   if(lv==="lessons")return tabs+renderLessonList();
   if(lv==="raise")return tabs+renderGuide();
-  var sizes=FMTS.filter(inRange);if(sizes.indexOf(st.lf)<0)st.lf=sizes[0];
-  var f=st.lf,h=tabs+'<p class="lead">Every preflop chart for one table size. Open a chart to study it, then drill it until the edges stick.</p>';
-  if(sizes.length>1)h+='<div class="lsizes" role="group" aria-label="Table size to study" style="grid-template-columns:repeat('+Math.min(sizes.length,4)+',1fr)">'+sizes.map(function(x){return '<button class="seg" data-lf="'+x+'" aria-pressed="'+(x===f)+'">'+FN[x]+'</button>';}).join("")+'</div>';
-  learnGroups(f).forEach(function(gr){
+  var h=tabs+'<p class="lead">Every preflop chart. A seat’s range depends on how many players are left to act behind you, not on how many sat down, so the same chart comes up at every table size where that many are left.</p>';
+  learnAll().forEach(function(gr){
     h+='<div class="sec">'+gr.t+'</div>';
-    gr.keys.forEach(function(k){var sp=RSPEC[k],open=!!(st.lopen&&st.lopen[f+"|"+k]);
-      h+='<details class="lcard" data-lk="'+f+'|'+k+'"'+(open?' open':'')+'><summary><span>'+cap(sp.desc)+'</span><b>'+chartPct(CH[sp.ch])+'%</b></summary><div class="lbody">'+
+    gr.keys.forEach(function(k){var sp=RSPEC[k],open=!!(st.lopen&&st.lopen["all|"+k]),fs=keySizes(k),inr=fs.filter(inRange),df=inr.length?inr[0]:fs[0];
+      h+='<details class="lcard" data-lk="all|'+k+'"'+(open?' open':'')+'><summary><span>'+cap(sp.desc)+'<small>'+keySub(k)+'</small></span><b>'+chartPct(CH[sp.ch])+'%</b></summary><div class="lbody">'+
         '<p class="es">'+color(learnNote(k))+'</p>'+rangeGrid(k,"")+'<div class="es"><span class="eh">Edges to remember</span>'+color(rangeText(k))+'</div>'+
-        '<button class="btn ldrill" data-drill="'+k+'" data-f="'+f+'">Drill this chart</button></div></details>';});
+        '<button class="btn ldrill" data-drill="'+k+'" data-f="'+df+'">Drill this chart</button></div></details>';});
   });
   return h;
 }

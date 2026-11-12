@@ -1,4 +1,4 @@
-const CACHE = "holdem-drill-2.2.3";
+const CACHE = "holdem-drill-2.2.4";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "icon.svg",
   "fonts/fraunces-latin-500-normal.woff2", "fonts/fraunces-latin-700-normal.woff2", "fonts/instrument-sans-latin-400-normal.woff2",
   "fonts/instrument-sans-latin-500-normal.woff2", "fonts/instrument-sans-latin-600-normal.woff2", "fonts/instrument-sans-latin-700-normal.woff2"];
