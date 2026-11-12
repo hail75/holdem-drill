@@ -33,9 +33,13 @@ A mobile-first practice app for **live No-Limit Hold'em cash games, heads-up to 
    - Reviews show up as "second try" (box 0) or "review" and never take more than one spot in four: at least three new spots (`REV_GAP`) come between reviews, however many are due (interleaving). At most five same-session reviews (`REV_MAX`) wait at once; `trimDue` moves older ones to tomorrow. The owner once saw almost only second tries, because misses from drills and quizzes piled up and 4+ due reviews were served back to back: new spots must stay the majority. The feedback says when the skill comes back.
    - Topic mix: `weighted()` uses `st.ew`, a recent error rate per topic (each answer counts 20%), not lifetime accuracy.
 
+13. **Sessions** (started from the two buttons under the answers on the Practice page; they show only before you answer and when no drill is running, and must stay below the answers so the question never moves down):
+   - **Play a hand** (`focus={h:steps,...}`): `dealHand(f)` builds one hand as a list of normal spots, one per street. You call a raise before the flop (a real Big blind defense or Facing a raise spot), then face bets on the flop and turn (`fbSpot`, topic Facing bets) and the river (`riverSpot`, topic River vs big bets). The hand follows the right play: it goes on while calling is the one right play and ends when the right play is to fold, or to re-raise before the flop. A wrong answer is graded and the hand goes on along the right line. The drill bar shows the street but never how many streets are left, because that would give the answer away. Turn and river cards never pair your hand or the board, so you hold one pair all the way. The opponent type (`VILS`: solid, bluffer, typical) decides the river. `finishSession()` shows the result card (`done`, `doneHTML`).
+   - **Warm-up** (`focus={w:true,...}`): ten spots, due reviews first (the one-in-four limit does not apply), then spots from the three topics with the highest recent error rate.
+
 The Learn page is not a topic: it shows charts and the raising guide, and drilling uses the existing topics.
 
-Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3-bets, Flop c-bets, River vs big bets, Pot odds, Draws & equity, Preflop ranges, All-in decisions, Adaptation, Concepts.
+Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3-bets, Flop c-bets, River vs big bets, Pot odds, Draws & equity, Preflop ranges, All-in decisions, Adaptation, Concepts, Facing bets.
 
 **Concepts** is a quiz on the ideas behind the rules (`CONCEPTS`: position, why bet, ranges, equity, domination, stack depth, board and players, mindset). Each group shares a principle and a common mistake; the first option is the right one. The questions explain the strategy rules below and must not contradict them: when a rule changes, check them too.
 
@@ -86,6 +90,11 @@ Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3
 - With a set: raise, **except** call when a straight is possible against a solid player.
 - A proven bluffer, or a small bet: call top pair.
 - Raise size (`riverRaise`): about 2.5x their bet, rounded to 5; all-in when that is 80% or more of what is left (200 minus half the pot). Every raise option shows its size.
+
+**Facing bets on the flop and turn** (you called a raise, one opponent bets; `pairInfo` sorts your hand; boards have no pair and no three of a suit; small = about 1/3 pot, big = about 3/4 pot):
+- Flop: two pair or better raises to 3x on a wet board, and calls or raises on a dry one. Top pair or an overpair calls any size and never raises. Second pair (or a pocket pair between the top two cards) calls a small bet and folds to a big one. Weaker pairs and nothing fold. Hands with a flush draw or a straight draw are not dealt as folds (draws belong to Draws & equity).
+- Turn, a second bet: two pair or better raises. Top pair or an overpair calls. Everything else folds, including second pair that called the flop. **One pair is worth two bets, not three**: the river is then decided by the River rules.
+- Raised after you bet the flop: against a passive player, one pair folds, two pair calls, a set or better calls or re-raises. Against a player who has shown bluff raises, top pair calls and two pair or better calls or re-raises.
 
 **Pot odds:** need = call ÷ (pot + bet + call). A bluff breaks even when they fold bet ÷ (pot + bet) of the time. Pots in the quiz divide evenly, so answers match the memorized prices (1/3 pot: call needs 20%, bluff needs 25%). Draw equity uses outs ×4 on the flop **only when the opponent is all-in**, and ×2 on the turn.
 

@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,CONCEPTS,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,CONCEPTS,pairInfo,dealHand,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -218,6 +218,38 @@ for (const L of X.LESSONS) {
 
 // 10. The version shown in the app must match the service worker cache
 const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-(\d+\.\d+\.\d+)"/);
+// Facing bets: the answers follow the rules
+{ const want = g => { const F = [1,0,0], C = [0,1,0], R = [0,0,1], CR = [0,1,1];
+    if (g.stage === "flop") return g.cat === "strong" ? (g.wet ? R : CR) : g.cat === "top" ? C : g.cat === "mid2" ? (g.big ? F : C) : F;
+    if (g.stage === "turn") return g.cat === "strong" ? R : g.cat === "top" ? C : F;
+    return g.cat === "top" ? (g.vil === "passive" ? F : C) : (g.monster || g.vil === "aggro" ? CR : C); };
+  for (let i = 0; i < 6000; i++) { const g = X.G["Facing bets"].gen(null); if (!g) { ok(false, "facing bets: no spot"); continue; }
+    const got = g.o.map(o => o.ok ? 1 : 0).join(""), pi = X.pairInfo(g.hand, g.board);
+    if (got !== want(g).join("")) ok(false, `facing bets ${g.sk}: got ${got}`);
+    if (pi.cat !== g.cat) ok(false, "facing bets: hand kind mismatch " + g.sk);
+    if (g.stage !== "raise" && pi.draw && g.cat !== "top" && g.cat !== "strong") ok(false, "facing bets: a folding hand has a draw");
+    if (g.stage !== "raise" && +g.o[1].t.split(" ")[1] !== g.bet) ok(false, "facing bets: call size");
+    if (new Set(g.board.map(c => c.v)).size !== g.board.length) ok(false, "facing bets: paired board"); } }
+// Whole hands: each street is a real spot, the pot adds up, and the hand stops when calling stops being right
+{ let n = 0, four = 0; for (let i = 0; i < 4000; i++) { const f = X.FMTS[i % X.FMTS.length], H = X.dealHand(f); if (!H) continue; n++;
+    const st = H.steps, names = ["Before the flop", "Flop", "Turn", "River"];
+    if (!H.end || !st.length || st.length > 4) ok(false, "hand: shape");
+    if (st.length === 4) four++;
+    st.forEach((g, k) => { const callOk = g.o.some(o => o.ok && /^Call/.test(o.t)), last = k === st.length - 1;
+      if (g.street !== names[k]) ok(false, "hand: street order");
+      if (!X.G[g.topic] || !g.e || !g.q || g.fm !== f) ok(false, "hand: step is not a full spot");
+      if (JSON.stringify(g.hand) !== JSON.stringify(st[0].hand)) ok(false, "hand: hole cards changed");
+      if (!last && !(callOk && g.o.filter(o => o.ok).length === 1)) ok(false, "hand: went on after a street where calling was not the one right play");
+      if (last && k < 3 && callOk) ok(false, "hand: stopped although calling was right");
+      if (k >= 1 && X.seatsFor(f).indexOf(g.you) < 0) ok(false, "hand: seat");
+      if (k >= 2 && JSON.stringify(g.board.slice(0, st[k-1].board.length)) !== JSON.stringify(st[k-1].board)) ok(false, "hand: board changed");
+      if (k === 2 && g.P !== st[1].P + 2 * st[1].bet) ok(false, "hand: turn pot");
+      if (k === 3) { const P = +g.act.match(/pot is (\d+)/)[1]; if (P !== st[2].P + 2 * st[2].bet) ok(false, "hand: river pot");
+        if (X.pairInfo(g.hand, g.board).cat !== "top") ok(false, "hand: river hand is not one pair at the top"); }
+      if (k >= 1 && k <= 2 && X.pairInfo(g.hand, g.board).cat === "strong") ok(false, "hand: strong hand before the river"); });
+    if (i < 80) st.forEach(g => { if (!X.variant(g.topic, g.fm, X.skillOf(g))) ok(false, "hand: skill cannot be dealt again " + X.skillOf(g)); }); }
+  ok(n > 3600 && four > 600, "whole hands deal reliably and often reach the river"); }
+
 // Concepts: every question has three different options, a reason, and can be dealt
 { const seen = new Set(); for (let i = 0; i < 4000; i++) { const g = X.G["Concepts"].gen(null); seen.add(g.sk);
     if (g.o.length !== 3 || g.o.filter(o => o.ok).length !== 1 || !g.o[0].ok || new Set(g.o.map(o => o.t)).size !== 3) ok(false, "concept options: " + g.q); }
