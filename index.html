@@ -1678,7 +1678,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.5.0",at:"2026-11-12T17:42Z"};
+var BUILD={v:"2.5.1",at:"2026-11-12T17:52Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1751,14 +1751,15 @@ function tableHTML(g){
 }
 
 /* Feedback after an answer: the verdict, the reason, then the deeper parts.
-   The deeper parts start open after a miss and closed after a right answer, so a correct streak stays quick. */
+   The principle and the common mistake start open after a miss and closed after a right answer, so a correct streak
+   stays quick. The range chart or rule table is always open (the owner asked for this). */
 function explHTML(g,ok){
   var secs=[],re=/<div class="es"><span class="eh">(.*?)<\/span>([\s\S]*?)<\/div>/g,m;while((m=re.exec(g.e)))secs.push([m[1],m[2]]);
   var right=g.o.filter(function(o){return o.ok;}).map(function(o){return o.t;}).join(" or ");
   var h='<div class="verdict '+(ok?"good":"bad")+'" role="status"><span class="vi" aria-hidden="true">'+(ok?"✓":"✗")+'</span><div><b>'+(ok?"Correct":"Not quite")+'</b>'+
     (ok?'':'<span>Answer: '+color(right)+'</span>')+(g.memo?'<small>'+g.memo+'</small>':'')+'</div></div>';
-  /* The chart or rule table is always open during a whole hand, so you see where your hand sits on every street. */
-  var rt=ruleTable(g),openRef=!ok||!!(focus&&focus.h);
+  /* The chart or rule table is always open, right or wrong, so you see where your hand sits every time. */
+  var rt=ruleTable(g),openRef=true;
   secs.forEach(function(s,i){
     h+=i===0?'<div class="why">'+color(s[1])+'</div>':'<details class="more"'+(ok?'':' open')+'><summary>'+s[0]+CHEV+'</summary><div>'+color(s[1])+'</div></details>';
   });
