@@ -13,15 +13,21 @@
 <meta name="apple-mobile-web-app-title" content="Hold’em Drill">
 <title>Endless Hold’em Drill</title>
 <style>
+@font-face{font-family:"Fraunces";font-weight:500;font-style:normal;font-display:swap;src:url("fonts/fraunces-latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"Fraunces";font-weight:700;font-style:normal;font-display:swap;src:url("fonts/fraunces-latin-700-normal.woff2") format("woff2")}
+@font-face{font-family:"Instrument Sans";font-weight:400;font-style:normal;font-display:swap;src:url("fonts/instrument-sans-latin-400-normal.woff2") format("woff2")}
+@font-face{font-family:"Instrument Sans";font-weight:500;font-style:normal;font-display:swap;src:url("fonts/instrument-sans-latin-500-normal.woff2") format("woff2")}
+@font-face{font-family:"Instrument Sans";font-weight:600;font-style:normal;font-display:swap;src:url("fonts/instrument-sans-latin-600-normal.woff2") format("woff2")}
+@font-face{font-family:"Instrument Sans";font-weight:700;font-style:normal;font-display:swap;src:url("fonts/instrument-sans-latin-700-normal.woff2") format("woff2")}
 :root{
-  --bg:#e9f0eb; --surface:#ffffff; --surface-2:#f4f8f5; --ink:#12241b; --muted:#53665b; --line:#cbd8cf;
+  --bg:#e9f0eb; --surface:#ffffff; --surface-2:#f4f8f5; --ink:#12241b; --muted:#53665b; --line:#cbd8cf; --track:#d3ded6;
   --felt:#1f6045; --felt-2:#2b7a57; --felt-3:#164a34; --felt-ink:#ffffff; --good:#1f6045; --good-bg:#d9eee1;
   --bad:#a62a2a; --bad-bg:#f6dcdc; --card:#fffdf8; --card-ink:#17201b; --card-red:#c4262d; --txt-red:#c4262d; --gold:#d9a53a;
   --shadow:0 1px 2px rgba(18,36,27,.06),0 6px 20px rgba(18,36,27,.07);
-  /* System fonts only: nothing to download, works offline, and it looks like the phone it runs on.
-     --serif is the display face (headings, numbers, card ranks); the name is historical. */
-  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --serif:var(--sans);
+  /* Fraunces for headings, numbers and card ranks; Instrument Sans for everything else (the owner's choice).
+     Both are bundled in fonts/ (SIL Open Font License), so the app works offline and loads nothing from outside. */
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
@@ -29,14 +35,14 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#0c1a13; --surface:#13271d; --surface-2:#102219; --ink:#e8f1ec; --muted:#9db3a6; --line:#274436;
+    --bg:#0c1a13; --surface:#13271d; --surface-2:#102219; --ink:#e8f1ec; --muted:#9db3a6; --line:#274436; --track:#2f4a3d;
     --felt:#1d6b4b; --felt-2:#2a8a62; --felt-3:#123d2b; --felt-ink:#f4fff9; --good:#7fd3a6; --good-bg:#17382a;
     --bad:#ff9a9a; --bad-bg:#3b1c1c; --txt-red:#ff8a8f; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#0c1a13; --surface:#13271d; --surface-2:#102219; --ink:#e8f1ec; --muted:#9db3a6; --line:#274436;
+  --bg:#0c1a13; --surface:#13271d; --surface-2:#102219; --ink:#e8f1ec; --muted:#9db3a6; --line:#274436; --track:#2f4a3d;
   --felt:#1d6b4b; --felt-2:#2a8a62; --felt-3:#123d2b; --felt-ink:#f4fff9; --good:#7fd3a6; --good-bg:#17382a;
   --bad:#ff9a9a; --bad-bg:#3b1c1c; --txt-red:#ff8a8f; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
 }
@@ -51,7 +57,7 @@ p{margin:0}
 .top{display:flex;align-items:center;gap:10px}
 .brand{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
 .logo{flex:none;width:30px;height:30px;display:block}
-h1{font-family:var(--serif);font-weight:800;letter-spacing:-.02em;font-size:20px;line-height:1.1;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .pills{display:flex;gap:6px}
 .pill{display:flex;align-items:baseline;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--muted);white-space:nowrap}
 .pill b{font-family:var(--serif);font-size:15px;color:var(--ink)}
@@ -115,7 +121,7 @@ h1{font-family:var(--serif);font-weight:800;letter-spacing:-.02em;font-size:20px
 @keyframes deal{from{opacity:0;transform:translateY(-6px) rotate(-2deg)}to{opacity:1;transform:none}}
 .r{color:var(--txt-red)}
 .qa{padding:12px 14px 14px}
-.q{font-family:var(--serif);font-weight:700;letter-spacing:-.01em;font-size:19px;line-height:1.3}
+.q{font-family:var(--serif);font-weight:500;font-size:19px;line-height:1.3}
 .opts{display:grid;gap:8px;margin-top:10px}
 .opt{font:inherit;font-size:16px;text-align:left;padding:11px 14px;border-radius:13px;border:1.5px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer;min-height:48px;display:flex;gap:12px;align-items:center;transition:transform .08s,border-color .15s,background .15s}
 .opt:hover:not(:disabled){border-color:var(--felt-2)}
@@ -184,7 +190,7 @@ h1{font-family:var(--serif);font-weight:800;letter-spacing:-.02em;font-size:20px
 .panel{width:100%;max-width:560px;max-height:calc(100% - 62px - env(safe-area-inset-top,0px));overflow:auto;background:var(--surface);border-radius:20px 20px 0 0;padding:12px 16px calc(20px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 30px rgba(0,0,0,.25);animation:up .2s ease-out}
 @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
 .phead{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
-.phead h2{font-family:var(--serif);font-weight:800;letter-spacing:-.02em;font-size:21px;margin:0}
+.phead h2{font-family:var(--serif);font-size:21px;margin:0}
 .sec{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:16px 0 8px}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
 .chip{font:inherit;font-size:14px;padding:7px 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:40px}
@@ -202,7 +208,8 @@ h1{font-family:var(--serif);font-weight:800;letter-spacing:-.02em;font-size:20px
 .tgl:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:8px}
 @media (prefers-reduced-motion:reduce){.tgl .sw,.tgl .sw::after{transition:none}}
 .trow{display:grid;grid-template-columns:1fr 90px 40px;gap:10px;align-items:center;font-size:14px;padding:5px 0}
-.bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--felt)}
+/* The empty part of a bar or ring must read as a track, so it uses a visible tint, not the faint border colour. */
+.bar{height:8px;background:var(--track);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;min-width:8px;border-radius:8px;background:var(--felt-2)}
 .pct{text-align:right;color:var(--muted)}
 .miss{padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px}
 .mt{font-size:12px;color:var(--muted);font-weight:700}
@@ -247,7 +254,7 @@ h1{font-family:var(--serif);font-weight:800;letter-spacing:-.02em;font-size:20px
 .ldots i.on{background:var(--good)}
 .lpage{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;font-size:16px;line-height:1.55}
 .lpage>small{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--good)}
-.lpage h2{font-family:var(--serif);font-weight:800;letter-spacing:-.02em;font-size:22px;line-height:1.2;margin:4px 0 10px}
+.lpage h2{font-family:var(--serif);font-size:22px;line-height:1.2;margin:4px 0 10px}
 .lpage p+p{margin-top:10px}
 .lpage .gtable,.lpage .rg-wrap{margin-top:14px}
 .ltip{margin-top:14px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--gold);background:rgba(217,165,58,.1);font-size:15px;line-height:1.45;font-weight:500}
@@ -258,7 +265,7 @@ h1{font-family:var(--serif);font-weight:800;letter-spacing:-.02em;font-size:20px
 .lres{text-align:center;border-radius:18px;padding:22px 16px;border:1.5px solid var(--line);margin-bottom:6px}
 .lres.good{background:var(--good-bg);border-color:var(--good)} .lres.bad{background:var(--bad-bg);border-color:var(--bad)}
 .lres small{font-size:12.5px;color:var(--muted);font-weight:600}
-.lres b{display:block;font-family:var(--serif);font-weight:800;letter-spacing:-.03em;font-size:44px;line-height:1.1;margin:4px 0}
+.lres b{display:block;font-family:var(--serif);font-size:44px;line-height:1.1;margin:4px 0}
 .lres.good b{color:var(--good)} .lres.bad b{color:var(--bad)}
 .lres p{font-size:15px}
 .lres~.btn{margin-top:10px}
@@ -338,7 +345,7 @@ h1{font-family:var(--serif);font-weight:800;letter-spacing:-.02em;font-size:20px
 .ring{position:relative;flex:none;width:84px;height:84px}
 .ring svg{width:84px;height:84px;transform:rotate(-90deg)}
 .ring circle{fill:none;stroke-width:8;stroke-linecap:round}
-.rbg{stroke:var(--line)} .rfg{stroke:var(--good)}
+.rbg{stroke:var(--track)} .rfg{stroke:var(--good)}
 .ring div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
 .ring b{font-family:var(--serif);font-size:20px}
 .ring span,.statcol span{font-size:11.5px;color:var(--muted)}
@@ -1400,7 +1407,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.2.1",at:"2026-11-12T03:29Z"};
+var BUILD={v:"2.2.3",at:"2026-11-12T03:41Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1419,7 +1426,7 @@ if(!(st.lo>=2&&st.hi<=9&&st.lo<=st.hi)){
 }
 delete st.fm;
 function inRange(f){return +f>=st.lo&&+f<=st.hi;}
-/* Review queue (smart mode). A missed skill climbs a ladder of growing gaps (successive relearning):
+/* Review queue. Always on: it is how the app teaches, not an option. A missed skill climbs a ladder of growing gaps (successive relearning):
    box 0: the exact spot again, 3-4 spots later. Box 1: a new spot of the same skill about 10 spots later.
    Box 2: about 25 spots later. Box 3: the next day. Box 4: three days later. Box 5: a week later.
    Right at box 5 = mastered. Wrong at any box = back to box 0 with that spot. */
@@ -1435,6 +1442,7 @@ st.ew=st.ew||{};TOPICS.forEach(function(t){if(st.ew[t]===undefined){var b=st.by[
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
 /* Ask the browser to keep this data instead of clearing it when space runs low or the app goes unused. Harmless if refused. */
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});}catch(e){}
+delete st.smart; /* once a switch; reviews and weak-topic weighting are now always on */
 var cur=null,picked=null,lastRev=false,focus=null,view="practice";
 
 /* ===================== Rendering helpers ===================== */
@@ -1583,8 +1591,7 @@ function renderProgress(){
   var h='<div class="statrow"><div class="ring"><svg viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="34" class="rbg"/><circle cx="42" cy="42" r="34" class="rfg" stroke-dasharray="'+(C*acc/100).toFixed(1)+' '+C.toFixed(1)+'"/></svg><div><b>'+(st.n?acc+'%':'–')+'</b><span>correct</span></div></div>'+
     '<div class="statcol"><div><b>'+st.n+'</b><span>spots</span></div><div><b>'+st.streak+'</b><span>streak</span></div><div><b>'+st.bestStreak+'</b><span>best</span></div></div></div>';
   h+='<div class="sec">Reviews</div>';
-  if(st.smart===false)h+='<p class="muted small">Smart mode is off, so missed spots don’t come back. Turn it on in Settings.</p>';
-  else h+='<div class="memo"><span><b>'+due+'</b>due now</span><span><b>'+rv.length+'</b>learning</span><span><b>'+st.mastered+'</b>mastered</span></div>'+
+  h+='<div class="memo"><span><b>'+due+'</b>due now</span><span><b>'+rv.length+'</b>learning</span><span><b>'+st.mastered+'</b>mastered</span></div>'+
     '<p class="muted small" style="margin-top:8px">'+(due?'Due reviews come up by themselves as you practice.':rv.length?'Nothing is due right now. The next reviews come up as you practice or after a day or more.':'Miss a spot and it shows up here until you have got it right six times, days apart.')+'</p>';
   h+='<div class="sec">Accuracy by topic</div>';
   var rows=TOPICS.map(function(t){var b=st.by[t];return {t:t,n:b[1],p:b[1]?Math.round(b[0]/b[1]*100):-1};}).sort(function(a,b){return (a.p<0)-(b.p<0)||a.p-b.p;});
@@ -1603,7 +1610,6 @@ function renderSettings(){
   var th=st.theme||"dark",dk=document.documentElement.getAttribute("data-theme")!=="light";
   var onCount=TOPICS.filter(function(t){return st.on[t]&&available(t);}).length;
   var h='<div class="sec">Table</div><div class="group"><button class="rowbtn" data-act="size"><span>Table size<small>Spots are dealt for these table sizes. Tap to change.</small></span><b>'+sizeLabel(st.lo,st.hi)+'</b>'+CHEV+'</button></div>';
-  h+='<div class="sec">Practice</div><div class="group">'+tgl("smart",st.smart!==false,"Smart mode","A spot you miss comes back 3 spots later. Get it right and new versions return after about 10 spots, 25 spots, then 1, 3 and 7 days. More questions come from topics you’ve missed recently.")+'</div>';
   h+='<div class="sec">Topics <span class="count">'+onCount+' of '+TOPICS.length+' on</span></div><div class="chips" style="margin-bottom:8px"><button class="chip small" data-act="all">Select all</button><button class="chip small" data-act="none">Clear</button></div>'+
     '<div class="chips">'+TOPICS.map(function(t){var av=available(t);return '<button class="chip" data-topic="'+t+'" aria-pressed="'+(!!st.on[t]&&av)+'"'+(av?'':' disabled title="Not available for the selected table sizes"')+'>'+t+'</button>';}).join("")+'</div>';
   h+='<div class="sec">Appearance and sound</div><div class="group">'+tgl("dark",dk,"Dark mode","",th==="auto")+tgl("auto",th==="auto","Match device","Follow your phone’s light or dark setting.")+tgl("sound",st.sound!==false,"Sound","Cards and chips: fold, check, call, raise and all-in each have their own sound.")+'</div>';
@@ -1661,7 +1667,7 @@ function next(){
   else if(focus){g=drillSpot(focus.k,focus.f);if(g)g.drill=true;}
   if(focus&&!g)focus=null;
   if(!g&&!on.length){cur=null;picked=null;render();return;}
-  if(!g&&st.smart!==false){
+  if(!g){
     /* Due reviews, lowest box first (freshest mistakes matter most). Never two reviews in a row unless several are waiting,
        so new spots stay mixed in. */
     var due=Object.keys(st.rev).filter(function(k){return isDue(st.rev[k])&&usable(st.rev[k]);}).sort(function(a,b){return st.rev[a].box-st.rev[b].box||st.rev[a].due-st.rev[b].due;});
@@ -1675,7 +1681,7 @@ function next(){
     }
   }
   if(!g){
-    var t=st.smart===false?pick(on):weighted(on),def=G[t],f=null;
+    var t=weighted(on),def=G[t],f=null;
     if(def.fmts)f=pick(def.fmts.filter(inRange));
     for(var i=0;i<20&&!g;i++)g=def.gen(f);
     if(!g)return next();
@@ -1734,9 +1740,8 @@ function answer(i){
   if(picked!==null||!cur)return;picked=i;var ok=cur.o[i].ok;
   sfx(sfxFor(cur.o[i].t));
   st.n++;st.by[cur.topic][1]++;st.ew[cur.topic]=st.ew[cur.topic]*.8+(ok?0:.2);
-  var smart=st.smart!==false;
-  if(smart&&cur.rv)cur.memo=reviewed(cur,ok);
-  else if(smart&&!ok){missed(cur);cur.memo="This one comes back in a few spots.";}
+  if(cur.rv)cur.memo=reviewed(cur,ok);
+  else if(!ok){missed(cur);cur.memo="This one comes back in a few spots.";}
   if(ok){st.c++;st.by[cur.topic][0]++;st.streak++;if(st.streak>st.bestStreak)st.bestStreak=st.streak;}
   else{st.streak=0;try{navigator.vibrate&&navigator.vibrate(40);}catch(e){}
     st.miss.push({topic:cur.topic,tag:cur.f?FN[cur.f]:cur.tag,hand:cur.hand?cur.hand.map(cs).join(" "):"",board:cur.board?cur.board.map(cs).join(" "):"",act:cur.act||"",
@@ -1783,8 +1788,7 @@ document.addEventListener("click",function(e){
   var b=e.target.closest("button");if(!b)return;
   if(b.dataset.nav){if(b.dataset.nav!==view)setView(b.dataset.nav);else try{window.scrollTo({top:0,behavior:"smooth"});}catch(e2){}return;}
   if(b.dataset.tgl){var k=b.dataset.tgl,on=b.getAttribute("aria-checked")!=="true";
-    if(k==="smart")st.smart=on;
-    else if(k==="sound"){st.sound=on;if(on)sfx("raise");}
+    if(k==="sound"){st.sound=on;if(on)sfx("raise");}
     else if(k==="dark")st.theme=on?"dark":"light";
     else st.theme=on?"auto":(document.documentElement.getAttribute("data-theme")==="light"?"light":"dark");
     save();applyTheme();render();return;}
