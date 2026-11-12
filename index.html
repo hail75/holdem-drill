@@ -317,7 +317,11 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .st.fold{opacity:.45}
 .st.acted{border-color:var(--gold)}
 .st.acted i{color:var(--ink);font-weight:700}
-.dl{position:absolute;top:-8px;right:-7px;width:15px;height:15px;border-radius:50%;background:var(--gold);color:#3a2a00;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.dl{position:absolute;top:-8px;right:-7px;width:15px;height:15px;border-radius:50%;background:#fbf7ec;color:#12241b;border:1px solid #12241b;box-sizing:border-box;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.chips{position:absolute;font-family:var(--serif);font-size:10.5px;font-weight:700;line-height:1;color:#3a2a00;background:var(--gold);border-radius:999px;padding:2px 6px;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.chips.t{bottom:calc(100% + 4px);left:50%;transform:translateX(-50%)}
+.chips.cl{left:-8px;bottom:-10px} .chips.cr{right:-8px;bottom:-10px}
+.chips.l{right:calc(100% + 4px);top:50%;transform:translateY(-50%)} .chips.r{left:calc(100% + 4px);top:50%;transform:translateY(-50%)}
 .ptable.many .st{min-width:36px;padding:2px 3px}
 .ptable.many .st b{font-size:10.5px;letter-spacing:-.2px}
 .ptable.many .st i{font-size:9px}
@@ -1077,7 +1081,7 @@ T("All-in decisions",FMTS,function(f){
       var ok=eq>need,hh=rr.h;
       return {sk:"call|"+who,f:f,you:hero,who:who,out:others(f,[hero,"BB"]),sub:{BB:"All-in"},act:"You raised to 5"+(f==="2"?"":" "+och.at)+". The big blind is "+R.name+" and moves all-in for 200. You need 195 more.",hand:rr.cards,label:hh.label,q:"Call or fold?",
         o:[O("Call 195",ok),O("Fold",!ok)],fixed:true,
-        e:E("Price: 195 to win "+(pot+call)+", so you need "+pct(need)+". This player shoves with about "+R.rng+". Against that range, "+hh.label+" has about "+pct(eq)+" equity. "+(ok?"That beats the price, so call.":"That is short of the price, so fold, even though "+hh.label+" is a good hand in general."),
+        e:E("Price: you pay 195 more, and the pot after your call is "+(pot+call)+" (200 from each of you"+(dead?", plus the small blind’s 1":"")+"). 195 ÷ "+(pot+call)+" = "+pct(need)+", so you need to win "+pct(need)+" of the time. This player shoves with about "+R.rng+". Against that range, "+hh.label+" has about "+pct(eq)+" equity. "+(ok?"That beats the price, so call.":"That is short of the price, so fold, even though "+hh.label+" is a good hand in general."),
           AI_PRIN+" At 100 big blinds, a tight player’s shove calls only AA-KK; a typical player’s shove calls QQ+ and AK; a maniac’s shove can be called much lighter.",
           "Calling because the hand “looks strong.” QQ and AK are about a coin flip or worse against a tight player’s shoving range.")};
     }
@@ -1400,6 +1404,29 @@ T("Facing bets",null,function(){
   return null;
 });
 
+/* The chips in front of each player, read from the spot, so the table shows the bets and the pot instead of leaving
+   them to the text. Keys are seat names, or "you" and "opp" for a spot without seats. pot is the pot before the bet
+   you face ("Pot is N" in the text), or the chips already in before the flop. */
+function tableChips(g){
+  var act=g.act||"",c={},real=!!(g.f&&g.you);
+  var last=function(re){var x=new RegExp(re.source,"g"),m,r=null;while((m=x.exec(act)))r=+m[1];return r;};
+  var theirs=function(){var x=/(\w+),? bets? (\d+)/g,m,r=null;while((m=x.exec(act)))if(!/^you$/i.test(m[1]))r=+m[2];return r;};
+  var allin=last(/all-in for (?:their last )?(\d+)/),raise=last(/[^-]raises? to (\d+)/),bet=theirs(),mine=last(/[Yy]ou bet (\d+)/),pm=act.match(/[Pp]ot is (\d+)/);
+  if(!real){
+    if(raise!==null&&mine!==null){c.opp=raise;c.you=mine;}else if(allin!==null)c.opp=allin;else if(bet!==null)c.opp=bet;else if(mine!==null)c.you=mine;
+    return {c:c,pot:pm?+pm[1]:null};
+  }
+  var sub=g.sub||{};
+  if(!g.board){
+    c[g.f==="2"?"BTN":"SB"]=1;c.BB=2;
+    var open=last(/You raised to (\d+)/);if(open!==null)c[g.you]=open;
+    Object.keys(sub).forEach(function(s){var L=sub[s],v=L==="Limp"?2:L==="Raise"?(raise||5):L==="Call"?(raise||open):L==="3-bet"?last(/re-raises to (\d+)/):L==="All-in"?allin:null;if(v)c[s]=v;});
+    var sum=0;Object.keys(c).forEach(function(k){sum+=c[k];});
+    return {c:c,pot:pm?+pm[1]:sum};
+  }
+  Object.keys(sub).forEach(function(s){var v=sub[s]==="Bet"?bet:sub[s]==="All-in"?allin:null;if(v)c[s]=v;});
+  return {c:c,pot:pm?+pm[1]:null};
+}
 /* The rule table shown after a spot that has no range chart: every kind of hand in this situation and what it does,
    with the row for your hand marked (hi). The text repeats the rules the generators follow; the tests check that. */
 function ruleTable(g){
@@ -1678,7 +1705,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.5.1",at:"2026-11-12T17:52Z"};
+var BUILD={v:"2.6.0",at:"2026-11-12T18:02Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1735,17 +1762,22 @@ var TITLES={practice:"Practice",learn:"Learn",progress:"Progress",settings:"Sett
    The pot and the board are in the middle. Spots without seats show you against one opponent. */
 function tableHTML(g){
   var real=!!(g.f&&g.you),seats;
-  if(real)seats=seatsFor(g.f).map(function(s){return {name:g.f==="2"&&s==="BTN"?"BTN/SB":SHORT[s],you:s===g.you,fold:(g.out||[]).indexOf(s)>=0,sub:(g.sub||{})[s]||"",btn:s==="BTN"};});
-  else seats=[{name:"You",you:true},{name:"Opponent",sub:""}];
+  if(real)seats=seatsFor(g.f).map(function(s){return {key:s,name:g.f==="2"&&s==="BTN"?"BTN/SB":SHORT[s],you:s===g.you,fold:(g.out||[]).indexOf(s)>=0,sub:(g.sub||{})[s]||"",btn:s==="BTN"};});
+  else seats=[{key:"you",name:"You",you:true},{key:"opp",name:"Opponent",sub:""}];
   var n=seats.length,hi=0;seats.forEach(function(s,j){if(s.you)hi=j;});
-  var pot=(g.act||"").match(/[Pp]ot is (\d+)/);
+  var tc=tableChips(g),pot=tc.pot===null?null:[0,tc.pot];
   var h='<div class="ptable'+(n>=7?' many':'')+'" aria-label="Table"><div class="oval"></div><div class="mid">'+
     (pot?'<span class="pot">Pot '+pot[1]+'</span>':g.board?'':'<span class="pot quiet">Blinds 1/2</span>')+
     (g.board?'<div class="board">'+g.board.map(function(c){return tile(c,"sm");}).join("")+'</div>':'')+'</div>';
   seats.forEach(function(s,j){
-    var a=(90+(j-hi)*360/n)*Math.PI/180,x=50+42*Math.cos(a),y=50+40*Math.sin(a);
+    var a=(90+(j-hi)*360/n)*Math.PI/180,x=50+42*Math.cos(a),y=50+40*Math.sin(a),chips=tc.c[s.key];
+    /* Chips sit beside the seat, on the side nearer the middle, where they cannot cover the pot or the board.
+       Before the flop your own chips sit above your seat. */
+    var side=s.you&&!g.board?"t":Math.cos(a)<-.5?"r":"l";
+    /* A seat level with the board has no room beside it, so its chips sit on its lower inner corner. */
+    if(g.board&&Math.abs(Math.sin(a))<.7)side="c"+side;
     h+='<div class="st'+(s.you?' you':'')+(s.fold?' fold':'')+(s.sub&&!s.you?' acted':'')+'" style="left:'+x.toFixed(1)+'%;top:'+y.toFixed(1)+'%">'+
-      (s.btn?'<span class="dl" aria-label="dealer button">D</span>':'')+'<b>'+s.name+'</b><i>'+(s.you?(real?'You':''):s.fold?'Fold':s.sub)+'</i></div>';
+      (s.btn?'<span class="dl" aria-label="dealer button">D</span>':'')+(chips?'<span class="chips '+side+'" aria-label="chips in front">'+chips+'</span>':'')+'<b>'+s.name+'</b><i>'+(s.you?(real?'You':''):s.fold?'Fold':s.sub)+'</i></div>';
   });
   return h+'</div>';
 }

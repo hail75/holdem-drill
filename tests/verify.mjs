@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,CONCEPTS,ruleTable,pairInfo,dealHand,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,CONCEPTS,tableChips,ruleTable,pairInfo,dealHand,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -230,6 +230,15 @@ const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/ho
     if (g.stage !== "raise" && pi.draw && g.cat !== "top" && g.cat !== "strong") ok(false, "facing bets: a folding hand has a draw");
     if (g.stage !== "raise" && +g.o[1].t.split(" ")[1] !== g.bet) ok(false, "facing bets: call size");
     if (new Set(g.board.map(c => c.v)).size !== g.board.length) ok(false, "facing bets: paired board"); } }
+// Table chips: before the flop the chips on the table add up to the pot in the text, and bets you face are shown
+{ for (const topic of Object.keys(X.G)) for (const f of X.G[topic].fmts || [null]) for (let i = 0; i < 150; i++) { const g = X.G[topic].gen(f); if (!g) continue;
+    const tc = X.tableChips(g), sum = Object.values(tc.c).reduce((a, b) => a + b, 0), pm = (g.act || "").match(/[Pp]ot is (\d+)/);
+    if (Object.values(tc.c).some(v => !(v > 0))) ok(false, "table chips: bad amount in " + topic);
+    if (g.f && g.you && !g.board) { if (pm && sum !== +pm[1]) ok(false, `table chips: ${topic} shows ${sum} in chips but the text says pot is ${pm[1]}`);
+      if (tc.pot !== sum) ok(false, "table chips: pot is not the sum before the flop in " + topic); }
+    const call = g.o.map(o => o.t.match(/^Call (\d+)$/)).filter(Boolean)[0];
+    if (call && g.board && !/raise to/.test(g.act) && !Object.values(tc.c).includes(+call[1])) ok(false, `table chips: ${topic} asks to call ${call[1]} but no seat shows that bet (${g.act})`); } }
+
 // Rule tables: the marked row names the play the spot grades as right
 { const first = t => t.split(/[ .]/)[0];
   for (const topic of ["Facing bets", "River vs big bets"]) for (let i = 0; i < 4000; i++) { const g = X.G[topic].gen(null); if (!g) continue; g.topic = topic;
