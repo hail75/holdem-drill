@@ -1211,6 +1211,82 @@ T("Adaptation",FMTS,function(f){
   return {steal:adSteal,fight:adFight,river:adRiver,bluff:adBluff,size:adSize,thin:adThin,check:adCheck,concept:adConcept}[k](f);
 });
 
+/* ===================== Concepts topic ===================== */
+/* The ideas behind the rules. Each group shares a principle and a common mistake; the first option is the right one.
+   Keep these in line with the strategy rules: they explain the rules, they do not add new ones. */
+var CONCEPTS=[
+ {k:"position",tag:"Position",
+  p:"Acting last is an advantage on every street: you see what they do before you decide, you can take a free card, and you control the size of the pot. That is why ranges get wider as you get closer to the button.",
+  m:"Playing the same hands from every seat. A hand that is a raise on the button is often a fold in an early seat.",
+  qs:[
+   {q:"Why can the button open far more hands than the early seats?",o:["Only the blinds are left to act, and it acts last after the flop","The button is dealt better cards on average","The blinds have to fold to a button raise"],e:"Two things make a weak hand playable: few players left who could wake up with a better one, and position after the flop. The button has both."},
+   {q:"What does acting last after the flop give you?",o:["You see what they do before you decide","A better chance of hitting the flop","The right to bet first"],e:"Their check or bet is information, and you get it for free on every street. You can bet when they show weakness and check behind when you want a free card."},
+   {q:"Folded to you in the small blind. Why raise or fold, and never just call?",o:["You play every later street out of position, so win it now or build a pot with a real hand","Calling there is against the rules","The big blind always folds to a raise"],e:"A limp lets the big blind see a flop for free and then act after you all hand. A raise can win the blinds on the spot, and when it is called you at least have a hand worth a bigger pot."}]},
+ {k:"betting",tag:"Why bet",
+  p:"A bet needs a reason. Value: worse hands call. Bluff: better hands fold. If neither happens often enough, checking is better.",
+  m:"Betting “to see where I’m at”. That bet gets called by better hands and folds out worse ones, the opposite of what you want.",
+  qs:[
+   {q:"What makes a bet a value bet?",o:["Worse hands call it often enough","You have a pair or better","It is a big bet"],e:"Value comes from the hands that call, not from your own cards. Top pair is a value bet against a player who calls with any pair, and not against one who only calls with two pair."},
+   {q:"What makes a bluff work?",o:["Better hands fold often enough","Looking confident","Having no pair"],e:"A bluff wins only when a better hand folds. Against a player who never folds, no bluff works, however good the story."},
+   {q:"You have a medium hand. Better hands will call a bet and worse hands will fold. What is the best play?",o:["Check","Bet small to find out where you stand","Bet big to protect it"],e:"A bet here wins nothing from worse hands and loses more to better ones. Checking keeps the pot small and lets worse hands bluff or catch up a little and pay you later."},
+   {q:"Everyone folds to you. Why raise instead of limping?",o:["You can win the blinds right now, and you take the lead with fewer players in","A raise guarantees you see the flop","Limping is not allowed before the flop"],e:"A raise has two ways to win: everyone folds, or you play a bigger pot as the player who showed strength. A limp has neither, and invites the whole table in."},
+   {q:"What is a 3-bet?",o:["A re-raise before the flop","A bet of three times the pot","The third bet on the flop"],e:"The blinds count as the first bet, the raise is the second, and the re-raise is the third. In most home games a 3-bet means a very strong hand."},
+   {q:"What is a continuation bet (c-bet)?",o:["A flop bet by the player who raised before the flop","A second bluff on the river","Any bet after a check"],e:"The raiser keeps telling the same story: I had a strong hand before the flop and I still do. It works best against one player on a dry board."}]},
+ {k:"ranges",tag:"Ranges",
+  p:"You never know their exact hand. Think of every hand they would play this way, then ask how your hand does against all of them.",
+  m:"Putting them on one hand, usually the one you fear or the one you hope for, and playing as if you knew.",
+  qs:[
+   {q:"What is a range?",o:["Every hand a player could hold, given how they have played so far","The gap between the smallest and the biggest bet","The hands you are beating"],e:"A raise from an early seat is a small, strong set of hands. A limp from a loose friend is a big, weak one. Your play should fit the whole set."},
+   {q:"A tight player raises before the flop, then bets the flop, turn and river. What happens to their range?",o:["It gets narrower and stronger with every bet","It stays the same as before the flop","It gets weaker, because strong hands slow-play"],e:"Each bet removes the hands that would have checked. By a big river bet, a tight player has mostly two pair or better left."},
+   {q:"What is a bluff catcher?",o:["A hand that beats only bluffs and loses to every value bet","A hand that makes a good bluff","A re-raise against a suspected bluff"],e:"Top pair facing a big river bet is the classic one. It is worth exactly as much as the number of bluffs in their range."},
+   {q:"A player who never bluffs makes a big river bet. What is your bluff catcher worth?",o:["Nothing: fold it","A call, because the price is good","A raise, to find out where you stand"],e:"A bluff catcher only wins when they are bluffing. If they never do, the price doesn’t matter: you are paying to see the better hand."}]},
+ {k:"equity",tag:"Equity",
+  p:"Equity is your share of the pot. A call is right when your equity is higher than the price, and a bet can also win by making them fold.",
+  m:"Counting only the times you hit, and forgetting the price you paid on all the times you missed.",
+  qs:[
+   {q:"What is equity?",o:["How often you win the pot on average if all the cards are dealt","The chips you have put into the pot","The size of the bet compared with the pot"],e:"A flush draw on the turn wins about one time in five, so it has about 20% equity. Compare that number with the price of a call."},
+   {q:"What is fold equity?",o:["What you gain when a bet makes them fold","Your chance of winning at showdown","The chips you save by folding"],e:"A bet can win without the best hand. How much that is worth depends on the player: a lot against someone who folds too much, nothing against someone who never does."},
+   {q:"What are implied odds?",o:["The extra chips you expect to win later when you hit","The price the pot is offering right now","The chance that your opponent is bluffing"],e:"A call can be wrong on the price today and still right if a hit wins a lot more on later streets. That only holds when they have chips left and will pay you off."},
+   {q:"Why can you call a raise with a small pair, hoping for a set you flop about one time in eight?",o:["When you hit you can win a whole stack, if the call is a small part of the stacks","Small pairs usually win without improving","The raiser usually folds on the flop"],e:"The call loses a little seven times and wins a lot once. It works because home-game players pay off sets, and only when the call is about a tenth of the stack or less."},
+   {q:"Why is betting a draw often better than calling with it?",o:["You can win two ways: they fold now, or you hit","A draw is the favourite against a made hand","It keeps the pot small"],e:"That is a semi-bluff. It needs a player who can fold, so against someone who calls everything, take the cheap card instead."}]},
+ {k:"dominated",tag:"Domination",
+  p:"The hands that cost the most are second-best hands. Choose hands that make the best pair, or make something strong and hidden, and avoid the ones that make a good-looking pair with a weak kicker.",
+  m:"Calling a raise with any two high cards because they “look strong”.",
+  qs:[
+   {q:"What does it mean to be dominated?",o:["You share a card with their hand and your other card is lower, like AT against AK","They have more chips than you","They act after you on every street"],e:"A dominated hand has about three cards that help it, and when the shared card pairs you both, you lose a big pot."},
+   {q:"Why does KTo fold to a raise, even though it looks good?",o:["When it makes top pair, it often loses a big pot to a better kicker","It rarely makes a pair","Offsuit hands cannot make a straight"],e:"A raiser’s range is full of AK, KQ, KJ and AT. KTo wins small pots when they miss and loses big ones when you both hit."},
+   {q:"What are reverse implied odds?",o:["The extra chips you lose later when you make a second-best hand","The extra chips you win later when you hit","The price of a bluff"],e:"They are the opposite of implied odds. A weak ace or a low flush draw can hit and still pay off a better ace or a bigger flush."}]},
+ {k:"stacks",tag:"Stack depth",
+  p:"The more chips left behind compared with the pot, the stronger the hand you need to play for all of them. One pair wins small pots. Big pots need two pair or better.",
+  m:"Getting attached to top pair or an overpair in a pot that keeps growing.",
+  qs:[
+   {q:"What is the stack-to-pot ratio (SPR)?",o:["The chips left behind divided by the pot","Your stack divided by the big blind","The bet divided by the pot"],e:"With 150 left and a pot of 50, the SPR is 3. It tells you how much more can go in, and so how strong a hand you need to put it in."},
+   {q:"When is top pair strong enough to play for all your chips?",o:["When the stacks left are about the size of the pot or smaller","Whenever your kicker is an ace","Never"],e:"With little left behind, the price is good and worse hands shove too. With deep stacks, a solid player who puts everything in has top pair beaten."},
+   {q:"Stacks are deep and a solid player keeps betting big. What do you need to continue?",o:["Two pair or better","Top pair with a good kicker","Any pair, since they could be bluffing"],e:"Solid players do not put three big bets in with one pair or a bluff. One pair is a bluff catcher here, and they are not bluffing."},
+   {q:"What is pot control?",o:["Checking or calling with a medium hand to keep the pot small","Betting big to take the pot now","Raising to see where you stand"],e:"A medium hand wants a cheap showdown. Every bet you add is called mostly by hands that beat you."}]},
+ {k:"board",tag:"Board and players",
+  p:"The board and the number of players decide what your hand is worth. A wet board and extra players both mean more strong hands and draws are out there.",
+  m:"Playing your cards and ignoring the board: betting the same way on K-7-2 as on J-T-9 with two hearts.",
+  qs:[
+   {q:"What makes a flop “wet”?",o:["Cards close in rank or of the same suit, so many draws are possible","An ace or a king on it","A pair on the board"],e:"J♥ T♥ 8♣ is wet: straights and flushes are one card away. K♠ 7♦ 2♣ is dry: almost nothing can draw."},
+   {q:"Why bet bigger with top pair on a wet board?",o:["Draws have to pay a bad price to chase","Wet boards make top pair stronger","To make better hands fold"],e:"Many hands can call you with a draw. A big bet charges them more than their chance of hitting is worth."},
+   {q:"You raised and missed a dry flop against one caller. Why does a small bet make money?",o:["They missed too most of the time, and a small bet needs few folds","A dry board always hits the raiser","A small bet looks stronger than a big one"],e:"A hand misses the flop about two times in three. A one-third pot bet only needs them to fold one time in four."},
+   {q:"Why bluff less against two callers than against one?",o:["Each extra player makes it more likely someone has a hand and calls","The pot is too small to win","A bluff has to be bigger"],e:"If each player folds half the time, both fold only a quarter of the time. Against two callers, bet your good hands and check the rest."}]},
+ {k:"mindset",tag:"Mindset",
+  p:"Judge the decision, not the result. A good play can lose and a bad play can win. Over many hands only the decisions count.",
+  m:"Changing a winning play because it lost once, or keeping a losing one because it won.",
+  qs:[
+   {q:"You get all the chips in before the flop with AA against KK and lose. What did you do wrong?",o:["Nothing: you got the chips in as a big favourite","You should have just called","You should have waited for a safer spot"],e:"Aces win that about four times out of five. Losing the fifth is the cost of playing, not a mistake."},
+   {q:"A friend calls a big bet with a gutshot, hits it and wins. Was it a good call?",o:["No: the price was wrong, and it loses chips over time","Yes: it won","Only if the cards were suited"],e:"A gutshot hits about one time in eleven on the next card. Paying a big bet for that loses most of the time, and one win doesn’t change the math."},
+   {q:"What is tilt?",o:["Playing worse because you are upset, usually after losing a pot","Leaning your range toward strong hands","Betting out of turn"],e:"Tilt turns one lost pot into three. The usual signs are playing more hands, calling to “get it back”, and bluffing players who never fold."},
+   {q:"What does it mean to exploit a player?",o:["Changing your play to punish a mistake they keep making","Playing a balanced strategy that can’t be beaten","Bluffing them every hand"],e:"If they call too much, you value bet more and stop bluffing. That beats them by more than a balanced strategy would."},
+   {q:"What is a GTO (balanced) strategy for?",o:["A baseline nobody can exploit, which you leave when you see a mistake to punish","Winning the most against weak players","Never losing a hand"],e:"GTO assumes opponents who play well. Home-game players make big, steady mistakes, so the most money comes from stepping away from the baseline to punish them."}]}
+];
+T("Concepts",null,function(){
+  var c=pick(CONCEPTS),i=rnd(c.qs.length),x=c.qs[i];
+  return {sk:c.k+"|"+i,tag:c.tag,q:x.q,o:x.o.map(function(t,j){return O(t,j===0);}),e:E(x.e,c.p,c.m)};
+});
+
 /* ===================== Learn ranges ===================== */
 /* Every chart a player needs at one table size, grouped the way the Learn view shows them. */
 function learnGroups(f){
@@ -1428,7 +1504,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.2.4",at:"2026-11-12T08:02Z"};
+var BUILD={v:"2.3.0",at:"2026-11-12T15:55Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}

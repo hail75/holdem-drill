@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,CONCEPTS,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -218,6 +218,14 @@ for (const L of X.LESSONS) {
 
 // 10. The version shown in the app must match the service worker cache
 const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/holdem-drill-(\d+\.\d+\.\d+)"/);
+// Concepts: every question has three different options, a reason, and can be dealt
+{ const seen = new Set(); for (let i = 0; i < 4000; i++) { const g = X.G["Concepts"].gen(null); seen.add(g.sk);
+    if (g.o.length !== 3 || g.o.filter(o => o.ok).length !== 1 || !g.o[0].ok || new Set(g.o.map(o => o.t)).size !== 3) ok(false, "concept options: " + g.q); }
+  const all = X.CONCEPTS.flatMap(c => c.qs.map((x, i) => c.k + "|" + i));
+  ok(all.length >= 30 && all.every(k => seen.has(k)), "every concept question can be dealt");
+  ok(X.CONCEPTS.every(c => c.p && c.m && c.tag && c.qs.every(x => x.q && x.e && x.o.length === 3)), "concept groups are complete");
+  const qs = X.CONCEPTS.flatMap(c => c.qs.map(x => x.q)); ok(new Set(qs).size === qs.length, "concept questions are unique"); }
+
 const appv = html.match(/var BUILD=\{v:"(\d+\.\d+\.\d+)",at:"(\d{4}-\d\d-\d\dT\d\d:\d\dZ)"/);
 ok(swv && appv && swv[1] === appv[1], `version in index.html (${appv && appv[1]}) must match the cache name in sw.js (${swv && swv[1]})`);
 

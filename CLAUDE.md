@@ -35,7 +35,9 @@ A mobile-first practice app for **live No-Limit Hold'em cash games, heads-up to 
 
 The Learn page is not a topic: it shows charts and the raising guide, and drilling uses the existing topics.
 
-Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3-bets, Flop c-bets, River vs big bets, Pot odds, Draws & equity, Preflop ranges, All-in decisions, Adaptation.
+Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3-bets, Flop c-bets, River vs big bets, Pot odds, Draws & equity, Preflop ranges, All-in decisions, Adaptation, Concepts.
+
+**Concepts** is a quiz on the ideas behind the rules (`CONCEPTS`: position, why bet, ranges, equity, domination, stack depth, board and players, mindset). Each group shares a principle and a common mistake; the first option is the right one. The questions explain the strategy rules below and must not contradict them: when a rule changes, check them too.
 
 ## Strategy source of truth (do not drift from this)
 **Opening ranges (raise first in), one per seat, the same at every table size:**
