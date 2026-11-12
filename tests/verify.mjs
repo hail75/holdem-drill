@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -168,6 +168,9 @@ for (const f of X.FMTS) for (const gr of X.learnGroups(f)) for (const k of gr.ke
   ok(g && g.rkey === k, `learn: cannot drill ${k} at ${f}-handed`);
   if (g && g.f) ok(g.f === f, `learn: drill for ${k} dealt the wrong table size`);
 }
+{ const listed = X.learnAll().flatMap(g => g.keys), used = new Set(X.FMTS.flatMap(f => X.learnGroups(f).flatMap(g => g.keys)));
+  ok(listed.length === new Set(listed).size && listed.length === used.size && listed.every(k => used.has(k)), "learn: the cheat sheet lists every chart exactly once");
+  for (const k of listed) { const fs = X.keySizes(k); ok(fs.length && X.drillSpot(k, fs[0]), `learn: ${k} can be drilled at ${fs[0]}`); } }
 ok(X.learnGroups("4")[0].keys.join() === "CO,BTN,SB" && X.learnGroups("2")[0].keys.join() === "BTNHU", "learn: opening charts per table size");
 
 // 12. River explanations name the straight: every listed straight is real, and none is missed
