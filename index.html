@@ -1504,7 +1504,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.3.0",at:"2026-11-12T15:55Z"};
+var BUILD={v:"2.3.1",at:"2026-11-12T16:16Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1524,15 +1524,20 @@ if(!(st.lo>=2&&st.hi<=9&&st.lo<=st.hi)){
 delete st.fm;
 function inRange(f){return +f>=st.lo&&+f<=st.hi;}
 /* Review queue. Always on: it is how the app teaches, not an option. A missed skill climbs a ladder of growing gaps (successive relearning):
-   box 0: the exact spot again, 3-4 spots later. Box 1: a new spot of the same skill about 10 spots later.
-   Box 2: about 25 spots later. Box 3: the next day. Box 4: three days later. Box 5: a week later.
-   Right at box 5 = mastered. Wrong at any box = back to box 0 with that spot. */
-var LADDER=[{n:3},{n:10},{n:25},{h:16},{h:72},{h:168}];
+   box 0: the exact spot again, 3-4 spots later. Box 1: a new spot of the same skill about 15 spots later.
+   Box 2: the next day. Box 3: three days later. Box 4: a week later.
+   Right at box 4 = mastered. Wrong at any box = back to box 0 with that spot.
+   New spots come first: at most one spot in four is a review (REV_GAP), and at most REV_MAX same-session reviews
+   wait at once. Older ones move to tomorrow, so a run of misses can never fill the session with second tries. */
+var LADDER=[{n:3},{n:15},{h:16},{h:72},{h:168}],DAYBOX=2,REV_GAP=3,REV_MAX=5;
 function validSpot(g){return !!(g&&G[g.topic]&&g.o&&g.o.length&&g.e&&(!g.rkey||RSPEC[g.rkey])&&(!g.f||!g.you||seatsFor(g.f).indexOf(g.you)>=0));}
 st.rev=st.rev||{};
 Object.keys(st.rev).forEach(function(k){if(!validSpot(st.rev[k].g))delete st.rev[k];});
 (st.retry||[]).forEach(function(x){if(x&&validSpot(x.g)){var k=skillOf(x.g);st.rev[k]={box:0,due:x.due,g:x.g,f:x.g.fm||x.g.f||null};}});
 delete st.retry;
+/* The ladder once had three same-session steps (boxes 0-2) before the day steps. Map those boxes to this ladder. */
+if(st.lad!==2){Object.keys(st.rev).forEach(function(k){var x=st.rev[k];if(x.box>=2)x.box--;});st.lad=2;}
+Object.keys(st.rev).forEach(function(k){var x=st.rev[k];if(!(x.box>=0&&x.box<LADDER.length))x.box=0;});
 st.mastered=st.mastered||0;
 /* Recent error rate per topic: each answer counts 20%, so the topic mix follows how you play now, not months ago. */
 st.ew=st.ew||{};TOPICS.forEach(function(t){if(st.ew[t]===undefined){var b=st.by[t];st.ew[t]=(b[1]-b[0]+1)/(b[1]+2);}});
@@ -1540,7 +1545,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
 /* Ask the browser to keep this data instead of clearing it when space runs low or the app goes unused. Harmless if refused. */
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){});}catch(e){}
 delete st.smart; /* once a switch; reviews and weak-topic weighting are now always on */
-var cur=null,picked=null,lastRev=false,focus=null,view="practice";
+var cur=null,picked=null,sinceRev=0,focus=null,view="practice";
 
 /* ===================== Rendering helpers ===================== */
 function $(id){return document.getElementById(id);}
@@ -1736,7 +1741,7 @@ function weighted(on){
 }
 function isDue(x){var L=LADDER[x.box];return L.n!==undefined?st.n>=x.due:Date.now()>=x.due;}
 function schedule(x){var L=LADDER[x.box];x.due=L.n!==undefined?st.n+L.n+rnd(2):Date.now()+L.h*3600000;}
-function plain(g){var c={};Object.keys(g).forEach(function(k){if(k!=="rv")c[k]=g[k];});return c;}
+function plain(g){var c={};Object.keys(g).forEach(function(k){if(k!=="rv"&&k!=="drill"&&k!=="box"&&k!=="memo")c[k]=g[k];});return c;}
 /* Missed: start the skill at box 0 with this exact spot. */
 function missed(g){
   var k=skillOf(g),x={box:0,g:plain(g),ver:BUILD.v,f:g.fm===undefined?(g.f||null):g.fm};schedule(x);st.rev[k]=x;
@@ -1751,6 +1756,11 @@ function reviewed(g,ok){
   x.g=plain(g);x.ver=BUILD.v;schedule(x);var L=LADDER[x.box];
   return "Next review: "+(L.n!==undefined?"in about "+L.n+" spots, with new cards.":L.h<24?"tomorrow.":"in "+Math.round(L.h/24)+" days.");
 }
+/* Keeps the same-session queue short: when more than REV_MAX of those reviews are due, the oldest move to tomorrow. */
+function trimDue(){
+  var ks=Object.keys(st.rev).filter(function(k){var x=st.rev[k];return x.box<DAYBOX&&isDue(x);}).sort(function(a,b){return st.rev[a].due-st.rev[b].due;});
+  while(ks.length>REV_MAX){var x=st.rev[ks.shift()];x.box=DAYBOX;schedule(x);}
+}
 function usable(x){return st.on[x.g.topic]&&available(x.g.topic)&&(x.f===null||inRange(x.f));}
 function next(){
   var on=TOPICS.filter(function(t){return st.on[t]&&available(t);});
@@ -1763,10 +1773,11 @@ function next(){
   if(focus&&!g)focus=null;
   if(!g&&!on.length){cur=null;picked=null;render();return;}
   if(!g){
-    /* Due reviews, lowest box first (freshest mistakes matter most). Never two reviews in a row unless several are waiting,
-       so new spots stay mixed in. */
+    /* Due reviews, lowest box first (freshest mistakes matter most). At least REV_GAP new spots come between two
+       reviews, however many are waiting, so most of a session is new spots. */
+    trimDue();
     var due=Object.keys(st.rev).filter(function(k){return isDue(st.rev[k])&&usable(st.rev[k]);}).sort(function(a,b){return st.rev[a].box-st.rev[b].box||st.rev[a].due-st.rev[b].due;});
-    if(due.length&&(!lastRev||due.length>=4)){
+    if(due.length&&sinceRev>=REV_GAP){
       var k=due[0],x=st.rev[k];
       var vf=x.f===null&&G[x.g.topic].fmts?pick(G[x.g.topic].fmts.filter(inRange)):x.f;
       /* Box 0 shows the exact spot again, but only if it was saved by this version: a spot saved by an older
@@ -1782,7 +1793,7 @@ function next(){
     if(!g)return next();
     g.topic=t;g.fm=f;
   }
-  lastRev=!!g.rv;
+  if(g.rv){sinceRev=0;delete g.drill;}else if(!g.drill)sinceRev++;
   if(!g.fixed){var idx=shuffle(g.o.map(function(_,i){return i;}));g.o=idx.map(function(i){return g.o[i];});}
   cur=g;picked=null;render();if(g.hand)sfx("deal");try{window.scrollTo(0,0);}catch(e){}
 }
