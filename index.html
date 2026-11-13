@@ -304,8 +304,10 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
   background:radial-gradient(90% 120% at 50% 35%,var(--felt-2) 0%,var(--felt) 55%,var(--felt-3) 100%);
   box-shadow:0 0 0 5px #3b2a1a,0 0 0 6.5px rgba(217,165,58,.45),inset 0 0 26px rgba(0,0,0,.35)}
 .mid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px}
-.pot{font-size:11.5px;font-weight:700;color:#eef8f2;background:rgba(0,0,0,.3);border-radius:999px;padding:2px 10px;white-space:nowrap}
-.pot.quiet{font-weight:600;opacity:.75}
+.pot{display:flex;flex-direction:column;align-items:center;line-height:1;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.pot small{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#bfe3d0}
+.pot b{font-family:var(--sans);font-size:19px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+.pot.quiet{font-size:11.5px;font-weight:600;color:#eef8f2;opacity:.75}
 .board{display:flex;gap:4px}
 .pc.sm{width:31px;height:43px;border-radius:5px;font-size:15px;box-shadow:0 1px 0 rgba(0,0,0,.25),0 3px 6px rgba(0,0,0,.2)}
 .pc.sm small{font-size:13px}
@@ -318,11 +320,17 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .st.acted{border-color:var(--gold)}
 .st.acted i{color:var(--ink);font-weight:700}
 .dl{position:absolute;top:-8px;right:-7px;width:15px;height:15px;border-radius:50%;background:#fbf7ec;color:#12241b;border:1px solid #12241b;box-sizing:border-box;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.4)}
-.stk{position:absolute;font-family:var(--serif);font-size:10.5px;font-weight:700;line-height:1;color:#3a2a00;background:var(--gold);border-radius:999px;padding:2px 6px;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.4)}
-.stk.t{bottom:calc(100% + 4px);left:50%;transform:translateX(-50%)}
-.stk.cl{left:-8px;bottom:-10px} .stk.cr{right:-8px;bottom:-10px}
+.stk{position:absolute;display:flex;align-items:center;gap:3px;font-family:var(--sans);font-size:13px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.75);white-space:nowrap}
+.stk::before{content:"";flex:none;width:13px;height:13px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+/* Chip colour by size, like casino chips: white 1-4, red 5-24, green 25-99, black 100 and up (the owner chose this). */
+.stk.d1::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'7.6'%20fill%3D'%23f4efe2'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'6.3'%20fill%3D'none'%20stroke%3D'%233d6fb5'%20stroke-width%3D'2.5'%20stroke-dasharray%3D'3.3%203.3'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'3.4'%20fill%3D'none'%20stroke%3D'%233d6fb5'%20stroke-opacity%3D'.75'%20stroke-width%3D'.9'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat}
+.stk.d2::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'7.6'%20fill%3D'%23c8372d'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'6.3'%20fill%3D'none'%20stroke%3D'%23fff'%20stroke-width%3D'2.5'%20stroke-dasharray%3D'3.3%203.3'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'3.4'%20fill%3D'none'%20stroke%3D'%23fff'%20stroke-opacity%3D'.75'%20stroke-width%3D'.9'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat}
+.stk.d3::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'7.6'%20fill%3D'%231f8a55'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'6.3'%20fill%3D'none'%20stroke%3D'%23fff'%20stroke-width%3D'2.5'%20stroke-dasharray%3D'3.3%203.3'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'3.4'%20fill%3D'none'%20stroke%3D'%23fff'%20stroke-opacity%3D'.75'%20stroke-width%3D'.9'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat}
+.stk.d4::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'7.6'%20fill%3D'%231b1b1b'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'6.3'%20fill%3D'none'%20stroke%3D'%23e6c15a'%20stroke-width%3D'2.5'%20stroke-dasharray%3D'3.3%203.3'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'3.4'%20fill%3D'none'%20stroke%3D'%23e6c15a'%20stroke-opacity%3D'.75'%20stroke-width%3D'.9'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat}
+.stk.t{bottom:calc(100% + 4px);left:50%;transform:translateX(-50%)} .stk.tb{bottom:calc(100% + 4px);right:50%}
 .stk.l{right:calc(100% + 4px);top:50%;transform:translateY(-50%)} .stk.r{left:calc(100% + 4px);top:50%;transform:translateY(-50%)}
-.ptable.many .st{min-width:36px;padding:2px 3px}
+.stk.ar{bottom:calc(100% + 3px);right:0} .stk.al{bottom:calc(100% + 3px);left:0} .stk.br{top:calc(100% + 3px);right:0} .stk.bl{top:calc(100% + 3px);left:0}
+.ptable.many .st{min-width:36px;padding:2px 6px}
 .ptable.many .st b{font-size:10.5px;letter-spacing:-.2px}
 .ptable.many .st i{font-size:9px}
 .hero{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:6px}
@@ -1804,7 +1812,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.8.1",at:"2026-11-13T15:27Z"};
+var BUILD={v:"2.9.0",at:"2026-11-13T15:38Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1866,17 +1874,21 @@ function tableHTML(g){
   var n=seats.length,hi=0;seats.forEach(function(s,j){if(s.you)hi=j;});
   var tc=tableChips(g),pot=tc.pot===null?null:[0,tc.pot];
   var h='<div class="ptable'+(n>=7?' many':'')+'" aria-label="Table"><div class="oval"></div><div class="mid">'+
-    (pot?'<span class="pot">Pot '+pot[1]+'</span>':g.board?'':'<span class="pot quiet">Blinds 1/2</span>')+
+    (pot?'<span class="pot"><small>Pot</small><b>'+pot[1]+'</b></span>':g.board?'':'<span class="pot quiet">Blinds 1/2</span>')+
     (g.board?'<div class="board">'+g.board.map(function(c){return tile(c,"sm");}).join("")+'</div>':'')+'</div>';
   seats.forEach(function(s,j){
     var a=(90+(j-hi)*360/n)*Math.PI/180,x=50+42*Math.cos(a),y=50+40*Math.sin(a),chips=tc.c[s.key];
     /* Chips sit beside the seat, on the side nearer the middle, where they cannot cover the pot or the board.
-       Before the flop your own chips sit above your seat. */
-    var side=s.you&&!g.board?"t":Math.cos(a)<-.5?"r":"l";
-    /* A seat level with the board has no room beside it, so its chips sit on its lower inner corner. */
-    if(g.board&&Math.abs(Math.sin(a))<.7)side="c"+side;
+       Before the flop your own chips sit above your seat. A seat level with the board has no room beside it, so its
+       chips go under it (upper half of the table) or over it (lower half), lined up with its outer edge. */
+    var sn=Math.sin(a),co=Math.cos(a),side=s.you&&!g.board?"t":g.board&&Math.abs(sn)<.7?(sn<0?"b":"a")+(co>0?"r":"l"):co<-.5?"r":"l";
+    /* The dealer button sits on the seat's top right corner, so chips never go there. */
+    if(s.btn&&side==="ar")side="br";
+    if(s.btn&&side==="t")side="tb";
+    /* Chip colour by size, like casino chips: 1-4, 5-24, 25-99, 100 and up. */
+    var den=chips>=100?"d4":chips>=25?"d3":chips>=5?"d2":"d1";
     h+='<div class="st'+(s.you?' you':'')+(s.fold?' fold':'')+(s.sub&&!s.you?' acted':'')+'" style="left:'+x.toFixed(1)+'%;top:'+y.toFixed(1)+'%">'+
-      (s.btn?'<span class="dl" aria-label="dealer button">D</span>':'')+(chips?'<span class="stk '+side+'" aria-label="chips in front">'+chips+'</span>':'')+'<b>'+s.name+'</b><i>'+(s.you?(real?'You':''):s.fold?'Fold':s.sub)+'</i></div>';
+      (s.btn?'<span class="dl" aria-label="dealer button">D</span>':'')+(chips?'<span class="stk '+side+' '+den+'" aria-label="chips in front">'+chips+'</span>':'')+'<b>'+s.name+'</b><i>'+(s.you?(real?'You':''):s.fold?'Fold':s.sub)+'</i></div>';
   });
   return h+'</div>';
 }
