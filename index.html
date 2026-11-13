@@ -1809,7 +1809,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.9.3",at:"2026-11-13T19:23Z"};
+var BUILD={v:"2.9.4",at:"2026-11-13T19:29Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -2059,32 +2059,43 @@ function renderSettings(){
   return h;
 }
 /* Draws the header, the current page and the bottom navigation. */
-/* Puts each chip on the table. A chip goes in the first free place next to its seat, trying the side that faces the
-   middle of the table first and then working round. Free means: on the felt (a white number off the felt cannot be
-   read in light mode), and clear of every seat, the dealer button, the pot, the board and the chips already placed.
-   Measured from the page, so it holds at any width and table size. Runs after every render and on resize. */
+/* Puts each chip on the table. Every place where the chip would touch the outside of its seat is tried (and three
+   wider rings after that), and the best free one wins: the nearest to the side of the seat that faces the middle of
+   the table. Free means: on the felt (a white number off the felt cannot be read in light mode), and clear of every
+   seat, the dealer button, the pot, the board and the chips already placed. A place level with the pot costs extra,
+   so a bet is not read as part of the pot ("90 POT 90"). Measured from the page, so it holds at any width and
+   table size. Runs after every render and on resize. */
 function placeChips(){
   var T=document.querySelector(".ptable");if(!T)return;
   var ov=T.querySelector(".oval").getBoundingClientRect(),rad=ov.height/2,cyv=ov.top+rad,cxv=(ov.left+ov.right)/2;
   var onFelt=function(x,y){
     if(y<ov.top+2||y>ov.bottom-2||x<ov.left+2||x>ov.right-2)return false;
     var cx=x<ov.left+rad?ov.left+rad:x>ov.right-rad?ov.right-rad:x;return (x-cx)*(x-cx)+(y-cyv)*(y-cyv)<=(rad-2)*(rad-2);};
-  var box=function(el,pad){var r=el.getBoundingClientRect();return {l:r.left-pad,r:r.right+pad,t:r.top-pad,b:r.bottom+pad};};
-  var blocks=[];
-  T.querySelectorAll(".st").forEach(function(el){blocks.push(box(el,el.classList.contains("you")?6:3));});
-  T.querySelectorAll(".dl,.pot,.board").forEach(function(el){blocks.push(box(el,3));});
+  var box=function(el,px,py){var r=el.getBoundingClientRect();return {l:r.left-px,r:r.right+px,t:r.top-py,b:r.bottom+py};};
+  var blocks=[],potEl=T.querySelector(".pot"),pot=potEl?box(potEl,0,0):null;
+  T.querySelectorAll(".st").forEach(function(el){var p=el.classList.contains("you")?6:3;blocks.push(box(el,p,p));});
+  T.querySelectorAll(".dl,.board").forEach(function(el){blocks.push(box(el,3,3));});
+  if(potEl)blocks.push(box(potEl,8,3));
   var hit=function(a){for(var i=0;i<blocks.length;i++){var b=blocks[i];if(a.l<b.r&&a.r>b.l&&a.t<b.b&&a.b>b.t)return true;}return false;};
-  var steps=[0];for(var n=1;n<=12;n++)steps.push(n,-n);
   T.querySelectorAll(".st").forEach(function(seat){
     var c=seat.querySelector(".stk");if(!c)return;
-    var sr=seat.getBoundingClientRect(),cr=c.getBoundingClientRect(),z=sr.width/(seat.offsetWidth||sr.width)||1;
-    var sx=(sr.left+sr.right)/2,sy=(sr.top+sr.bottom)/2,base=Math.atan2(cyv-sy,cxv-sx),gap=(seat.classList.contains("you")?8:5)*z,best=null;
-    for(var d=0;d<6&&!best;d++)for(var k=0;k<steps.length&&!best;k++){
-      var a=base+steps[k]*Math.PI/12,x=sx+Math.cos(a)*(sr.width/2+cr.width/2+gap+d*7*z),y=sy+Math.sin(a)*(sr.height/2+cr.height/2+gap+d*7*z);
-      var q={l:x-cr.width/2,r:x+cr.width/2,t:y-cr.height/2,b:y+cr.height/2};
-      if(onFelt(q.l,q.t)&&onFelt(q.r,q.t)&&onFelt(q.l,q.b)&&onFelt(q.r,q.b)&&!hit(q))best=q;
+    var sr=seat.getBoundingClientRect(),cr=c.getBoundingClientRect(),z=sr.width/(seat.offsetWidth||sr.width)||1,w=cr.width,h=cr.height;
+    var sx=(sr.left+sr.right)/2,sy=(sr.top+sr.bottom)/2,gap=(seat.classList.contains("you")?8:5)*z;
+    var dx=cxv-sx,dy=cyv-sy,dl=Math.sqrt(dx*dx+dy*dy)||1,ix=sx+dx/dl*(sr.width/2+w/2+gap),iy=sy+dy/dl*(sr.height/2+h/2+gap);
+    var best=null,bestCost=1e9,step=3*z;
+    var tryAt=function(x,y,ring){
+      var q={l:x-w/2,r:x+w/2,t:y-h/2,b:y+h/2};
+      if(!(onFelt(q.l,q.t)&&onFelt(q.r,q.t)&&onFelt(q.l,q.b)&&onFelt(q.r,q.b))||hit(q))return;
+      var cost=Math.sqrt((x-ix)*(x-ix)+(y-iy)*(y-iy))+ring*6*z+(pot&&q.t<pot.b&&q.b>pot.t&&q.l<pot.r+40*z&&q.r>pot.l-40*z?30*z:0);
+      if(cost<bestCost){bestCost=cost;best=q;}
+    };
+    for(var ring=0;ring<4;ring++){
+      var g=gap+ring*7*z,L=sr.left-g-w/2,R=sr.right+g+w/2,Tp=sr.top-g-h/2,B=sr.bottom+g+h/2,x,y;
+      for(x=L;x<=R;x+=step){tryAt(x,Tp,ring);tryAt(x,B,ring);}
+      for(y=Tp;y<=B;y+=step){tryAt(L,y,ring);tryAt(R,y,ring);}
+      if(best&&ring>=1)break;
     }
-    if(!best){var x0=sx+Math.cos(base)*(sr.width/2+cr.width/2+gap),y0=sy+Math.sin(base)*(sr.height/2+cr.height/2+gap);best={l:x0-cr.width/2,r:x0+cr.width/2,t:y0-cr.height/2,b:y0+cr.height/2};}
+    if(!best)best={l:ix-w/2,r:ix+w/2,t:iy-h/2,b:iy+h/2};
     blocks.push({l:best.l-3,r:best.r+3,t:best.t-3,b:best.b+3});
     /* The seat's own box is the chip's frame; its border is outside that frame. */
     c.style.left=((best.l-sr.left)/z-seat.clientLeft)+"px";c.style.top=((best.t-sr.top)/z-seat.clientTop)+"px";c.style.visibility="visible";
