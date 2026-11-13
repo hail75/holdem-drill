@@ -860,8 +860,8 @@ function riverSpot(type,opp,board,hole,P,ctx){
     var w="Your hand: "+hname(s)+". Calling "+bet+" to win "+(P+2*bet)+" means you need to win "+need+"% of the time. ";
     if(type==="top"){
       if(opp==="solid"){F=true;w+="List the hands a solid player bets big on three streets: two pair, sets"+(sp?", straights ("+sn+")":"")+", and maybe a better kicker. Almost no worse hand bets this way, and few bluffs do. Top pair wins far less than "+need+"%.";}
-      else if(opp==="bluffer"){C=true;w+="This player’s range now includes real bluffs: missed draws and air. Top pair beats every bluff, so it wins more than "+need+"% even though it loses to their value hands.";}
-      else {C=true;w+="A small bet gives you a great price. Top pair only has to be good about 1 time in "+Math.round(100/need)+", and it easily is against everything a player bets small with.";}}
+      else if(opp==="bluffer"){C=true;w+="This player’s range now includes real bluffs: missed draws and air. Top pair beats every bluff, so it wins more than "+need+"% even though it loses to their value hands. Call, but don’t raise: a raise makes every bluff fold, and the only hands that call it are the ones that beat you.";}
+      else {C=true;w+="A small bet gives you a great price. Top pair only has to be good about 1 time in "+Math.round(100/need)+", and it easily is against everything a player bets small with. Just call: a raise folds out the weaker hands you beat and is called by the better ones.";}}
     else if(type==="two"){
       if(opp==="solid"){C=true;w+="Top two pair beats top pair, overpairs, weaker two pairs and every bluff. Only sets"+(sp?" and straights ("+sn+")":"")+" beat you. Even a solid player bets big with enough worse hands that this is a call"+(sp?", but not a raise, because the straight is one of their likely value hands":"")+".";}
       else {C=true;R=true;w+="Two pair beats most of their range. Calling is clearly fine, and raising for value is fine too, because worse hands like top pair may call.";}}
@@ -1705,7 +1705,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.6.0",at:"2026-11-12T18:02Z"};
+var BUILD={v:"2.6.1",at:"2026-11-13T03:59Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
