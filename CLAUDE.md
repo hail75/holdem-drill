@@ -126,6 +126,7 @@ Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3
 - River explanations once said “a straight is possible” without naming it, and a wheel (52 on A-4-3) looked like a mistake. `strNames` now names every straight.
 - Seat text once said "about 36%" for the cutoff while the chart was 35%. Text now reads the chart.
 - The table’s chip badges were once given the CSS class `chips`, which the Settings topic list already used, so the whole topic list turned into a gold blob. The badges are `.stk`. Before adding a CSS class, search the file for the name, and look at all four pages after a style change, not only the page you changed.
+- That broken Settings page kept coming back on the owner’s phone after it was fixed, whenever the connection was poor: the service worker had stored an `index.html` from the browser’s HTTP cache, which could be one release old. `sw.js` now fetches with `cache: "reload"` when it installs and `cache: "no-cache"` afterwards, and the page reloads once when a new release takes over. Keep both.
 
 ## Conventions
 - **Text:** plain, direct English, no fluff. Typographic apostrophes and quotes (’ “ ”) in visible text, straight quotes in code.
