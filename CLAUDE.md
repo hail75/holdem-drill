@@ -122,6 +122,7 @@ Topics: Preflop opens, Big blind defense, Facing a raise, Facing limps, Facing 3
 - Reviews once replayed a spot saved before the table-size context was added, so “what share does the cutoff open” showed with no table size.
 - River explanations once said “a straight is possible” without naming it, and a wheel (52 on A-4-3) looked like a mistake. `strNames` now names every straight.
 - Seat text once said "about 36%" for the cutoff while the chart was 35%. Text now reads the chart.
+- The table’s chip badges were once given the CSS class `chips`, which the Settings topic list already used, so the whole topic list turned into a gold blob. The badges are `.stk`. Before adding a CSS class, search the file for the name, and look at all four pages after a style change, not only the page you changed.
 
 ## Conventions
 - **Text:** plain, direct English, no fluff. Typographic apostrophes and quotes (’ “ ”) in visible text, straight quotes in code.
