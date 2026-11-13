@@ -22,7 +22,7 @@
 :root{
   --bg:#e9f0eb; --surface:#ffffff; --surface-2:#f4f8f5; --ink:#12241b; --muted:#53665b; --line:#cbd8cf; --track:#d3ded6;
   --felt:#1f6045; --felt-2:#2b7a57; --felt-3:#164a34; --felt-ink:#ffffff; --good:#1f6045; --good-bg:#d9eee1;
-  --bad:#a62a2a; --bad-bg:#f6dcdc; --card:#fffdf8; --card-ink:#17201b; --card-red:#c4262d; --txt-red:#c4262d; --gold:#d9a53a;
+  --bad:#a62a2a; --bad-bg:#f6dcdc; --card:#fffdf8; --card-ink:#17201b; --card-edge:0 0 0 1px rgba(18,36,27,.22),0 2px 0 rgba(18,36,27,.28),0 6px 14px rgba(18,36,27,.22); --card-red:#c4262d; --txt-red:#c4262d; --gold:#d9a53a;
   --shadow:0 1px 2px rgba(18,36,27,.06),0 6px 20px rgba(18,36,27,.07);
   /* Fraunces for headings, numbers and card ranks; Instrument Sans for everything else (the owner's choice).
      Both are bundled in fonts/ (SIL Open Font License), so the app works offline and loads nothing from outside. */
@@ -37,14 +37,14 @@
     color-scheme:dark;
     --bg:#0c1a13; --surface:#13271d; --surface-2:#102219; --ink:#e8f1ec; --muted:#9db3a6; --line:#274436; --track:#2f4a3d;
     --felt:#1d6b4b; --felt-2:#2a8a62; --felt-3:#123d2b; --felt-ink:#f4fff9; --good:#7fd3a6; --good-bg:#17382a;
-    --bad:#ff9a9a; --bad-bg:#3b1c1c; --txt-red:#ff8a8f; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+    --bad:#ff9a9a; --bad-bg:#3b1c1c; --txt-red:#ff8a8f; --card-edge:0 2px 0 rgba(0,0,0,.25),0 4px 10px rgba(0,0,0,.18); --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
   --bg:#0c1a13; --surface:#13271d; --surface-2:#102219; --ink:#e8f1ec; --muted:#9db3a6; --line:#274436; --track:#2f4a3d;
   --felt:#1d6b4b; --felt-2:#2a8a62; --felt-3:#123d2b; --felt-ink:#f4fff9; --good:#7fd3a6; --good-bg:#17382a;
-  --bad:#ff9a9a; --bad-bg:#3b1c1c; --txt-red:#ff8a8f; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  --bad:#ff9a9a; --bad-bg:#3b1c1c; --txt-red:#ff8a8f; --card-edge:0 2px 0 rgba(0,0,0,.25),0 4px 10px rgba(0,0,0,.18); --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
 }
 *,*::before,*::after{box-sizing:inherit}
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -113,7 +113,7 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .cards{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .cards .lbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(238,248,242,.7);width:46px}
 .badge{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);border:1.5px solid rgba(217,165,58,.6);border-radius:8px;padding:1px 8px;margin-left:4px}
-.pc{width:40px;height:56px;border-radius:7px;background:var(--card);color:var(--card-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:18px;line-height:1.05;box-shadow:0 2px 0 rgba(0,0,0,.25),0 4px 10px rgba(0,0,0,.18);animation:deal .22s ease-out both}
+.pc{width:40px;height:56px;border-radius:7px;background:var(--card);color:var(--card-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:18px;line-height:1.05;box-shadow:var(--card-edge);animation:deal .22s ease-out both}
 .pc:nth-child(3){animation-delay:.03s}.pc:nth-child(4){animation-delay:.06s}.pc:nth-child(5){animation-delay:.09s}.pc:nth-child(6){animation-delay:.12s}
 .pc.r{color:var(--card-red)}
 .pc .ten{letter-spacing:-1.5px}
@@ -320,18 +320,13 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .st.acted{border-color:var(--gold)}
 .st.acted i{color:var(--ink);font-weight:700}
 .dl{position:absolute;top:-8px;right:-7px;width:15px;height:15px;border-radius:50%;background:#fbf7ec;color:#12241b;border:1px solid #12241b;box-sizing:border-box;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.4)}
-.stk{position:absolute;display:flex;align-items:center;gap:3px;font-family:var(--sans);font-size:13px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.75);white-space:nowrap}
+.stk{position:absolute;left:0;top:0;visibility:hidden;display:flex;align-items:center;gap:3px;font-family:var(--sans);font-size:13px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.85),0 0 4px rgba(0,0,0,.45);white-space:nowrap}
 .stk::before{content:"";flex:none;width:13px;height:13px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
 /* Chip colour by size, like casino chips: white 1-4, red 5-24, green 25-99, black 100 and up (the owner chose this). */
 .stk.d1::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'7.6'%20fill%3D'%23f4efe2'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'6.3'%20fill%3D'none'%20stroke%3D'%233d6fb5'%20stroke-width%3D'2.5'%20stroke-dasharray%3D'3.3%203.3'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'3.4'%20fill%3D'none'%20stroke%3D'%233d6fb5'%20stroke-opacity%3D'.75'%20stroke-width%3D'.9'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat}
 .stk.d2::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'7.6'%20fill%3D'%23c8372d'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'6.3'%20fill%3D'none'%20stroke%3D'%23fff'%20stroke-width%3D'2.5'%20stroke-dasharray%3D'3.3%203.3'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'3.4'%20fill%3D'none'%20stroke%3D'%23fff'%20stroke-opacity%3D'.75'%20stroke-width%3D'.9'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat}
 .stk.d3::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'7.6'%20fill%3D'%231f8a55'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'6.3'%20fill%3D'none'%20stroke%3D'%23fff'%20stroke-width%3D'2.5'%20stroke-dasharray%3D'3.3%203.3'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'3.4'%20fill%3D'none'%20stroke%3D'%23fff'%20stroke-opacity%3D'.75'%20stroke-width%3D'.9'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat}
 .stk.d4::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'7.6'%20fill%3D'%231b1b1b'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'6.3'%20fill%3D'none'%20stroke%3D'%23e6c15a'%20stroke-width%3D'2.5'%20stroke-dasharray%3D'3.3%203.3'%2F%3E%3Ccircle%20cx%3D'8'%20cy%3D'8'%20r%3D'3.4'%20fill%3D'none'%20stroke%3D'%23e6c15a'%20stroke-opacity%3D'.75'%20stroke-width%3D'.9'%2F%3E%3C%2Fsvg%3E") center/contain no-repeat}
-.stk.t{bottom:calc(100% + 9px);left:50%;transform:translateX(-50%)} .stk.tb{bottom:calc(100% + 9px);right:50%}
-/* Your seat has a gold ring outside its box, so your chips sit further off than other seats' chips. */
-.st.you .stk.l{right:calc(100% + 9px)} .st.you .stk.r{left:calc(100% + 9px)}
-.stk.l{right:calc(100% + 4px);top:50%;transform:translateY(-50%)} .stk.r{left:calc(100% + 4px);top:50%;transform:translateY(-50%)}
-.stk.ar{bottom:calc(100% + 3px);right:0} .stk.al{bottom:calc(100% + 3px);left:0} .stk.br{top:calc(100% + 3px);right:0} .stk.bl{top:calc(100% + 3px);left:0}
 .ptable.many .st{min-width:36px;padding:2px 6px}
 .ptable.many .st b{font-size:10.5px;letter-spacing:-.2px}
 .ptable.many .st i{font-size:9px}
@@ -1814,7 +1809,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.9.2",at:"2026-11-13T16:59Z"};
+var BUILD={v:"2.9.3",at:"2026-11-13T19:23Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1880,17 +1875,10 @@ function tableHTML(g){
     (g.board?'<div class="board">'+g.board.map(function(c){return tile(c,"sm");}).join("")+'</div>':'')+'</div>';
   seats.forEach(function(s,j){
     var a=(90+(j-hi)*360/n)*Math.PI/180,x=50+42*Math.cos(a),y=50+40*Math.sin(a),chips=tc.c[s.key];
-    /* Chips sit beside the seat, on the side nearer the middle, where they cannot cover the pot or the board.
-       Before the flop your own chips sit above your seat. A seat level with the board has no room beside it, so its
-       chips go under it (upper half of the table) or over it (lower half), lined up with its outer edge. */
-    var sn=Math.sin(a),co=Math.cos(a),side=s.you&&!g.board?"t":g.board&&Math.abs(sn)<.7?(sn<0?"b":"a")+(co>0?"r":"l"):co<-.5?"r":"l";
-    /* The dealer button sits on the seat's top right corner, so chips never go there. */
-    if(s.btn&&side==="ar")side="br";
-    if(s.btn&&side==="t")side="tb";
     /* Chip colour by size, like casino chips: 1-4, 5-24, 25-99, 100 and up. */
     var den=chips>=100?"d4":chips>=25?"d3":chips>=5?"d2":"d1";
     h+='<div class="st'+(s.you?' you':'')+(s.fold?' fold':'')+(s.sub&&!s.you?' acted':'')+'" style="left:'+x.toFixed(1)+'%;top:'+y.toFixed(1)+'%">'+
-      (s.btn?'<span class="dl" aria-label="dealer button">D</span>':'')+(chips?'<span class="stk '+side+' '+den+'" aria-label="chips in front">'+chips+'</span>':'')+'<b>'+s.name+'</b><i>'+(s.you?(real?'You':''):s.fold?'Fold':s.sub)+'</i></div>';
+      (s.btn?'<span class="dl" aria-label="dealer button">D</span>':'')+(chips?'<span class="stk '+den+'" aria-label="chips in front">'+chips+'</span>':'')+'<b>'+s.name+'</b><i>'+(s.you?(real?'You':''):s.fold?'Fold':s.sub)+'</i></div>';
   });
   return h+'</div>';
 }
@@ -2071,6 +2059,37 @@ function renderSettings(){
   return h;
 }
 /* Draws the header, the current page and the bottom navigation. */
+/* Puts each chip on the table. A chip goes in the first free place next to its seat, trying the side that faces the
+   middle of the table first and then working round. Free means: on the felt (a white number off the felt cannot be
+   read in light mode), and clear of every seat, the dealer button, the pot, the board and the chips already placed.
+   Measured from the page, so it holds at any width and table size. Runs after every render and on resize. */
+function placeChips(){
+  var T=document.querySelector(".ptable");if(!T)return;
+  var ov=T.querySelector(".oval").getBoundingClientRect(),rad=ov.height/2,cyv=ov.top+rad,cxv=(ov.left+ov.right)/2;
+  var onFelt=function(x,y){
+    if(y<ov.top+2||y>ov.bottom-2||x<ov.left+2||x>ov.right-2)return false;
+    var cx=x<ov.left+rad?ov.left+rad:x>ov.right-rad?ov.right-rad:x;return (x-cx)*(x-cx)+(y-cyv)*(y-cyv)<=(rad-2)*(rad-2);};
+  var box=function(el,pad){var r=el.getBoundingClientRect();return {l:r.left-pad,r:r.right+pad,t:r.top-pad,b:r.bottom+pad};};
+  var blocks=[];
+  T.querySelectorAll(".st").forEach(function(el){blocks.push(box(el,el.classList.contains("you")?6:3));});
+  T.querySelectorAll(".dl,.pot,.board").forEach(function(el){blocks.push(box(el,3));});
+  var hit=function(a){for(var i=0;i<blocks.length;i++){var b=blocks[i];if(a.l<b.r&&a.r>b.l&&a.t<b.b&&a.b>b.t)return true;}return false;};
+  var steps=[0];for(var n=1;n<=12;n++)steps.push(n,-n);
+  T.querySelectorAll(".st").forEach(function(seat){
+    var c=seat.querySelector(".stk");if(!c)return;
+    var sr=seat.getBoundingClientRect(),cr=c.getBoundingClientRect(),z=sr.width/(seat.offsetWidth||sr.width)||1;
+    var sx=(sr.left+sr.right)/2,sy=(sr.top+sr.bottom)/2,base=Math.atan2(cyv-sy,cxv-sx),gap=(seat.classList.contains("you")?8:5)*z,best=null;
+    for(var d=0;d<6&&!best;d++)for(var k=0;k<steps.length&&!best;k++){
+      var a=base+steps[k]*Math.PI/12,x=sx+Math.cos(a)*(sr.width/2+cr.width/2+gap+d*7*z),y=sy+Math.sin(a)*(sr.height/2+cr.height/2+gap+d*7*z);
+      var q={l:x-cr.width/2,r:x+cr.width/2,t:y-cr.height/2,b:y+cr.height/2};
+      if(onFelt(q.l,q.t)&&onFelt(q.r,q.t)&&onFelt(q.l,q.b)&&onFelt(q.r,q.b)&&!hit(q))best=q;
+    }
+    if(!best){var x0=sx+Math.cos(base)*(sr.width/2+cr.width/2+gap),y0=sy+Math.sin(base)*(sr.height/2+cr.height/2+gap);best={l:x0-cr.width/2,r:x0+cr.width/2,t:y0-cr.height/2,b:y0+cr.height/2};}
+    blocks.push({l:best.l-3,r:best.r+3,t:best.t-3,b:best.b+3});
+    /* The seat's own box is the chip's frame; its border is outside that frame. */
+    c.style.left=((best.l-sr.left)/z-seat.clientLeft)+"px";c.style.top=((best.t-sr.top)/z-seat.clientTop)+"px";c.style.visibility="visible";
+  });
+}
 function nextLabel(){
   var last=focus&&focus.i>=focus.n;
   return focus&&focus.h?(last?"See the hand →":"Next street →"):focus&&(focus.q||focus.w)&&last?"See your result →":"Next spot →";
@@ -2085,6 +2104,7 @@ function render(){
   $("bar").hidden=!(view==="practice"&&cur&&picked!==null);
   $("nextbtn").textContent=nextLabel();
   tsPaint(st.lo,st.hi);
+  if(view==="practice")placeChips();
 }
 function setView(v){
   view=v;
@@ -2308,6 +2328,8 @@ try{new MutationObserver(function(){if(!applying){var want=st.theme==="auto"?nul
 try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(st.theme==="auto"){applyTheme();render();}});}catch(e){}
 applyTheme();
 next();
+window.addEventListener("resize",function(){if(view==="practice")placeChips();});
+try{document.fonts.ready.then(function(){if(view==="practice")placeChips();});}catch(e){}
 </script>
 <script>
 /* When a new release takes over, reload once so the page on screen is never an older one than the files behind it.
