@@ -19,7 +19,7 @@
 - **Plays whole hands.** One hand, one decision per street: call before the flop, then face bets on the flop, turn and river, and learn where to get out.
 - **Warms you up.** Ten spots from your due reviews and weakest topics, for the half hour before a game.
 - **Teaches, not just tests.** A 16-lesson course, every preflop range chart, and a guide to raise and re-raise sizes.
-- **Works on a phone or a computer.** A one-hand layout on a phone, a two-column table view on a wide screen, and optional Google sign-in to keep progress in step between them ([setup](docs/sync-setup.md)).
+- **Works on a phone or a computer.** A one-hand layout on a phone, and a two-column table view on a wide screen.
 - **Adapts to your table.** Pick any range of table sizes from heads-up to 9-handed. A seat plays the same range whenever the same players are left to act.
 
 ## Topics
@@ -42,7 +42,7 @@ It is a study tool, not a solver. The rules are written down in [`CLAUDE.md`](CL
 
 ## Install on a phone
 
-Open the link above in Chrome or Safari, then choose **Install app** or **Add to Home Screen**. It runs full screen and keeps working without a connection. Progress is stored on the device, and in your Google account if the site owner has turned sign-in on.
+Open the link above in Chrome or Safari, then choose **Install app** or **Add to Home Screen**. It runs full screen and keeps working without a connection. Progress is stored on the device.
 
 ## Under the hood
 
