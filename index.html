@@ -342,6 +342,9 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .verdict span:not(.vi){display:block;font-weight:600;font-size:15px}
 .verdict small{display:block;font-size:13px;color:var(--muted);margin-top:1px}
 .why{margin-top:12px;font-size:15.5px;line-height:1.55}
+.wn{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:14.5px;line-height:1.5}
+.wn>span{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.wn p{margin-top:6px;color:var(--muted)} .wn p b{color:var(--ink);font-weight:600} .wn p b::after{content:":"} .wn p.mine b{color:var(--bad)}
 .more{margin-top:10px;border-top:1px solid var(--line)}
 .more summary{display:flex;align-items:center;justify-content:space-between;min-height:44px;cursor:pointer;list-style:none;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .more summary::-webkit-details-marker{display:none}
@@ -598,7 +601,7 @@ function scene(f,you,acts){
   flush(true);
   return {text:parts.length?parts.join(" "):"You are first to act.",out:out,sub:sub};
 }
-function O(t,ok){return {t:t,ok:!!ok};}
+function O(t,ok,n){var o={t:t,ok:!!ok};if(n)o.n=n;return o;}
 function potFor(f){return f==="2"?10:11;}
 function E(why,principle,trap){
   var h='<div class="es"><span class="eh">Why</span>'+why+'</div>';
@@ -856,12 +859,12 @@ function riverSpot(type,opp,board,hole,P,ctx){
     var act=ctx?ctx.act(P,bet):opp==="solid"?"A solid player who rarely bluffs bet the flop and turn. River: pot is "+P+", they bet "+bet+". You have "+(200-P/2)+" left.":
       opp==="bluffer"?"This player has shown two river bluffs tonight. They bet the flop and turn. River: pot is "+P+", they bet "+bet+". You have "+(200-P/2)+" left.":
       "Opponent bet the flop and turn. River: pot is "+P+", they bet "+bet+". You have "+(200-P/2)+" left.";
-    var sp=strPossible(board),sn=sp?strNames(board):"",F=false,C=false,R=false,nm=type==="top"?(hole[0].v===hole[1].v?"an overpair":"top pair"):type==="two"?"top two pair":"a set",hiSet=type==="set"&&hole[0].v===sorted[0];
+    var sp=strPossible(board),sn=sp?strNames(board):"",F=false,C=false,R=false,RN="",nm=type==="top"?(hole[0].v===hole[1].v?"an overpair":"top pair"):type==="two"?"top two pair":"a set",hiSet=type==="set"&&hole[0].v===sorted[0];
     var w="Your hand: "+hname(s)+". Calling "+bet+" to win "+(P+2*bet)+" means you need to win "+need+"% of the time. ";
     if(type==="top"){
       if(opp==="solid"){F=true;w+="List the hands a solid player bets big on three streets: two pair, sets"+(sp?", straights ("+sn+")":"")+", and maybe a better kicker. Almost no worse hand bets this way, and few bluffs do. Top pair wins far less than "+need+"%.";}
-      else if(opp==="bluffer"){C=true;w+="This player’s range now includes real bluffs: missed draws and air. Top pair beats every bluff, so it wins more than "+need+"% even though it loses to their value hands. Call, but don’t raise: a raise makes every bluff fold, and the only hands that call it are the ones that beat you.";}
-      else {C=true;w+="A small bet gives you a great price. Top pair only has to be good about 1 time in "+Math.round(100/need)+", and it easily is against everything a player bets small with. Just call: a raise folds out the weaker hands you beat and is called by the better ones.";}}
+      else if(opp==="bluffer"){C=true;w+="This player’s range now includes real bluffs: missed draws and air. Top pair beats every bluff, so it wins more than "+need+"% even though it loses to their value hands.";RN="A raise makes every bluff fold, and the only hands that call it are the ones that beat you.";}
+      else {C=true;w+="A small bet gives you a great price. Top pair only has to be good about 1 time in "+Math.round(100/need)+", and it easily is against everything a player bets small with.";RN="A raise folds out the weaker hands you beat and is called only by the better ones.";}}
     else if(type==="two"){
       if(opp==="solid"){C=true;w+="Top two pair beats top pair, overpairs, weaker two pairs and every bluff. Only sets"+(sp?" and straights ("+sn+")":"")+" beat you. Even a solid player bets big with enough worse hands that this is a call"+(sp?", but not a raise, because the straight is one of their likely value hands":"")+".";}
       else {C=true;R=true;w+="Two pair beats most of their range. Calling is clearly fine, and raising for value is fine too, because worse hands like top pair may call.";}}
@@ -869,7 +872,7 @@ function riverSpot(type,opp,board,hole,P,ctx){
     else {R=true;if(sp&&opp!=="solid")C=true;w+="A set is near the top of your possible hands here ("+(hiSet?"":"only a higher set ")+(sp?(hiSet?"only a straight beats you":"or a straight beats you"):(hiSet?"nothing beats you":"beats you"))+"). Raise for value: worse two pairs and sets call."+(sp?" Calling is also fine, since a straight is possible ("+sn+").":"");}
     if(R)w+=" "+RZ.why;
     return {sk:type+"|"+opp+(sp?"|str":""),tag:"River",kind:type,vil:opp,sp:sp,act:act,board:board,hand:hole,q:"You have "+nm+". What do you do?",
-      o:[O("Fold",F),O("Call "+bet,C),O(RZ.t,R)],
+      o:[O("Fold",F),O("Call "+bet,C),O(RZ.t,R,R?"":RN)],
       e:E(w,"Before calling a river bet, list the worse hands that would bet this way. If you can’t name many, and the player rarely bluffs, fold. The bigger the bet and the more streets they’ve bet, the stronger their range.",
         "Calling big bets on every street with one pair because “it’s top pair.” Top pair wins small pots. Big pots usually need two pair or better.")};
 }
@@ -1404,6 +1407,75 @@ T("Facing bets",null,function(){
   return null;
 });
 
+/* Why a wrong option is wrong, in one line, shown under the main reason after every answer. The owner asked for
+   this: an explanation must also say why the other answers lose. An option can carry its own note (o.n); otherwise
+   the line comes from the kind of play it is, set against the right play. Returns "" for a right option, or when the
+   options are not plays (percentages, hands, ideas). */
+function optKind(g,o){
+  var t=o.t;
+  if(/^Fold/.test(t))return "fold";
+  if(t==="Check")return "check";
+  if(/limp/i.test(t))return "limp";
+  if(/^Call/.test(t))return "call";
+  if(/^(Raise|Re-raise|\d-bet|All-in)/.test(t))return "raise";
+  var m=t.match(/^Bet (?:about )?(\d+)/);
+  if(m){var ns=g.o.map(function(x){var y=x.t.match(/^Bet (?:about )?(\d+)/);return y?+y[1]:null;}).filter(function(x){return x!==null;});
+    return ns.length<2?"bet":+m[1]===Math.max.apply(null,ns)?"betB":"betS";}
+  return null;
+}
+function whyNot(g,i){
+  var o=g.o[i];if(!o||o.ok)return "";
+  if(o.n)return o.n;
+  var W=optKind(g,o),RS={};g.o.forEach(function(x){if(x.ok){var k=optKind(g,x);if(k)RS[k]=1;}});
+  if(!W||!Object.keys(RS).length)return "";
+  var pre=!g.board,river=!!g.board&&g.board.length===5,agg=RS.raise||RS.bet||RS.betS||RS.betB,onlyFold=RS.fold&&Object.keys(RS).length===1;
+  if(g.topic==="Draws & equity"){
+    if(W==="raise")return "Raising all-in risks your whole stack on a draw that misses most of the time.";
+    if(W==="call")return "Calling pays more than the draw’s chance of hitting is worth.";
+    if(W==="fold")return "Folding gives up a draw that hits often enough for this price.";
+  }
+  var cat=String(g.sk||"").split("|")[0],isBet=W==="bet"||W==="betS"||W==="betB";
+  if(g.topic==="Adaptation"){
+    /* Stealing and fighting back depend on the player, not the hand; the main reason covers them. */
+    if(cat==="steal"||cat==="fight")return "";
+    if(cat==="bluff")return isBet?"A bluff only works when they fold, and this player does not.":W==="check"?"Checking gives up a pot that this player folds.":"";
+  }
+  if(g.topic==="Flop c-bets"&&cat==="nothing"){
+    if(W==="betB"&&RS.betS)return "A big bluff risks more chips to fold out the same hands a small bet folds.";
+    if(W==="check")return "Checking gives up a pot that a small bet wins often enough.";
+    if(isBet)return "A bluff here gets called or raised too often to make money.";
+  }
+  if(W==="fold"){
+    if(RS.check)return "Folding throws the hand away when checking costs nothing.";
+    if(RS.call||RS.limp)return "Folding gives up a hand that wins often enough for the price.";
+    return pre?"Folding throws away a hand that is strong enough to raise.":"Folding gives up a hand that is ahead of most of what they bet with.";
+  }
+  if(W==="call"){
+    if(onlyFold)return pre?"Calling puts chips in with a hand that is behind their range and makes second-best hands.":"Calling pays off a range that mostly beats you. The price does not make up for that.";
+    if(agg)return pre?"Calling is too passive with a hand this strong: a raise builds the pot while you are ahead.":river?"Calling wins less: worse hands would pay off a raise.":"Calling wins less: worse hands would pay off a raise, and a later card can stop the action.";
+    return "";
+  }
+  if(W==="limp"){
+    if(agg)return "Just calling gives up the chance to win the pot now and lets everyone in cheaply.";
+    if(onlyFold)return "Limping pays to see a flop with a hand that is not worth playing here.";
+    return "";
+  }
+  if(W==="raise"){
+    if(/^Raise to/.test(o.t)&&g.o.some(function(x){return x.ok&&/^All-in/.test(x.t);}))return "With a stack this short a normal raise commits you anyway. Move all-in, so nobody can re-raise you off the hand.";
+    if(onlyFold&&/^All-in/.test(o.t))return "Moving all-in risks your whole stack with a hand outside the range for this seat.";
+    if(onlyFold)return pre?"Raising puts even more chips in with a hand that should not be played here.":"Raising turns a losing call into a bigger loss: only better hands continue.";
+    if(RS.raise)return "";
+    return pre?"Raising builds a big pot with a hand that is not strong enough: better hands continue and worse ones fold.":"Raising makes the hands you beat fold, and gets called by the hands that beat you.";
+  }
+  if(W==="check"){
+    if(!agg)return "";
+    return pre?"Checking lets weak hands see a free flop when a raise would make them pay.":river?"Checking wins nothing from the worse hands that would have called.":"Checking gives a free card and wins nothing from the worse hands that would have called.";
+  }
+  if(W==="betS"&&RS.betB&&!RS.betS)return river?"A small bet wins less from a hand that would have called a big one.":"A small bet gives draws a cheap card and wins less from the hands that would call a big one.";
+  if(W==="betB"&&RS.betS&&!RS.betB)return "A big bet folds out the weaker hands that a small bet keeps paying.";
+  if((W==="bet"||W==="betS"||W==="betB")&&RS.check&&!agg)return "Betting here gets called mostly by better hands and folds out the worse ones.";
+  return "";
+}
 /* The chips in front of each player, read from the spot, so the table shows the bets and the pot instead of leaving
    them to the text. Keys are seat names, or "you" and "opp" for a spot without seats. pot is the pot before the bet
    you face ("Pot is N" in the text), or the chips already in before the flop. */
@@ -1705,7 +1777,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.6.1",at:"2026-11-13T03:59Z"};
+var BUILD={v:"2.7.0",at:"2026-11-13T04:02Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1792,8 +1864,12 @@ function explHTML(g,ok){
     (ok?'':'<span>Answer: '+color(right)+'</span>')+(g.memo?'<small>'+g.memo+'</small>':'')+'</div></div>';
   /* The chart or rule table is always open, right or wrong, so you see where your hand sits every time. */
   var rt=ruleTable(g),openRef=true;
+  /* Why each wrong option loses sits straight under the main reason, with the one you picked first. */
+  var wn=g.o.map(function(o,i){return {i:i,t:o.t,n:whyNot(g,i)};}).filter(function(x){return x.n;}).sort(function(a,b){return (b.i===picked)-(a.i===picked);});
+  var wnH=wn.length?'<div class="wn"><span>Why not the other'+(wn.length>1?'s':'')+'</span>'+wn.map(function(x){return '<p'+(x.i===picked?' class="mine"':'')+'><b>'+color(x.t)+'</b> '+color(x.n)+'</p>';}).join("")+'</div>':'';
+  if(!secs.length)h+=wnH;
   secs.forEach(function(s,i){
-    h+=i===0?'<div class="why">'+color(s[1])+'</div>':'<details class="more"'+(ok?'':' open')+'><summary>'+s[0]+CHEV+'</summary><div>'+color(s[1])+'</div></details>';
+    h+=i===0?'<div class="why">'+color(s[1])+'</div>'+wnH:'<details class="more"'+(ok?'':' open')+'><summary>'+s[0]+CHEV+'</summary><div>'+color(s[1])+'</div></details>';
   });
   if(rt)h+='<details class="more"'+(openRef?' open':'')+'><summary>The rules'+CHEV+'</summary><div><p style="margin-bottom:8px">'+rt.t+':</p><div class="gtable">'+
     rt.rows.map(function(r,i){return '<div'+(i===rt.hi?' class="me"':'')+'><span>'+r[0]+'</span><b>'+r[1]+'</b></div>';}).join("")+'</div></div></details>';

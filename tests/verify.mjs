@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const engine = script.slice(0, script.indexOf("/* ===================== State"));
-const X = new Function(engine + "; return {G,CH,CONCEPTS,tableChips,ruleTable,pairInfo,dealHand,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
+const X = new Function(engine + "; return {G,CH,CONCEPTS,whyNot,optKind,tableChips,ruleTable,pairInfo,dealHand,RSPEC,FMTS,inCh,hc,parse,flopInfo,best,DRAWS,SHOVE,EQ,equityVs,chartPct,strNames,skillOf,variant,learnGroups,learnAll,keySizes,learnNote,drillSpot,RAISE_GUIDE,LESSONS,UNITS,lessonSizes,lessonSpot,seatsFor,openSeats,openKey,bbKey,pushKey,scene,isPrem,isEdge,rangeText,rangeGrid,strongVsLimp,specHand};")();
 let fails = 0;
 const seen = new Set();
 const ok = (c, m) => { if (!c) { fails++; if (!seen.has(m)) { seen.add(m); console.log("FAIL:", m); } } };
@@ -230,6 +230,15 @@ const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/ho
     if (g.stage !== "raise" && pi.draw && g.cat !== "top" && g.cat !== "strong") ok(false, "facing bets: a folding hand has a draw");
     if (g.stage !== "raise" && +g.o[1].t.split(" ")[1] !== g.bet) ok(false, "facing bets: call size");
     if (new Set(g.board.map(c => c.v)).size !== g.board.length) ok(false, "facing bets: paired board"); } }
+// Why not the others: in every topic where the options are plays, each wrong option gets a reason and no right one does
+{ const plays = ["Preflop opens", "Big blind defense", "Facing a raise", "Facing limps", "Facing 3-bets", "Flop c-bets", "River vs big bets", "Draws & equity", "All-in decisions", "Facing bets"];
+  for (const topic of plays) for (const f of X.G[topic].fmts || [null]) for (let i = 0; i < 300; i++) { const g = X.G[topic].gen(f); if (!g) continue; g.topic = topic;
+    g.o.forEach((o, k) => { const n = X.whyNot(g, k);
+      if (o.ok && n) ok(false, `why not: a right option has a reason (${topic}: ${o.t})`);
+      if (!o.ok && !n) ok(false, `why not: no reason for "${o.t}" in ${topic} (${g.o.map(x => (x.ok ? "*" : "") + x.t).join(" | ")})`); }); }
+  for (const topic of ["Adaptation", "Concepts", "Pot odds", "Preflop ranges"]) for (let i = 0; i < 300; i++) { const g = X.G[topic].gen(X.G[topic].fmts ? "4" : null); if (!g) continue; g.topic = topic;
+    g.o.forEach((o, k) => { if (o.ok && X.whyNot(g, k)) ok(false, "why not: a right option has a reason in " + topic); }); } }
+
 // Table chips: before the flop the chips on the table add up to the pot in the text, and bets you face are shown
 { for (const topic of Object.keys(X.G)) for (const f of X.G[topic].fmts || [null]) for (let i = 0; i < 150; i++) { const g = X.G[topic].gen(f); if (!g) continue;
     const tc = X.tableChips(g), sum = Object.values(tc.c).reduce((a, b) => a + b, 0), pm = (g.act || "").match(/[Pp]ot is (\d+)/);
