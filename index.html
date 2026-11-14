@@ -347,14 +347,12 @@ h1{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.1;margi
 .verdict span:not(.vi){display:block;font-weight:600;font-size:15px}
 .verdict small{display:block;font-size:13px;color:var(--muted);margin-top:1px}
 .why{margin-top:12px;font-size:15.5px;line-height:1.55}
-.wn{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:14.5px;line-height:1.5}
-.wn>span{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.wn{margin-top:10px;font-size:15px;line-height:1.5}
 .wn p{margin-top:6px;color:var(--muted)} .wn p b{color:var(--ink);font-weight:600} .wn p b::after{content:":"} .wn p.mine b{color:var(--bad)}
-.more{margin-top:10px;border-top:1px solid var(--line)}
-.more summary{display:flex;align-items:center;justify-content:space-between;min-height:44px;cursor:pointer;list-style:none;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-.more summary::-webkit-details-marker{display:none}
-.more[open] summary svg{transform:rotate(180deg)}
-.more>div{font-size:15.5px;line-height:1.55;padding-bottom:4px}
+.prin{margin-top:12px;font-size:15px;line-height:1.5;color:var(--muted)} .prin b{color:var(--ink);font-weight:600}
+.ref{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:15px;line-height:1.5}
+.ref>span{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.ref>p{margin-bottom:8px}
 .empty{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 16px;text-align:center}
 .empty .btn{margin-top:14px}
 
@@ -1827,7 +1825,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.10.0",at:"2026-11-14T03:31Z"};
+var BUILD={v:"2.10.1",at:"2026-11-14T03:34Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}
@@ -1911,18 +1909,18 @@ function explHTML(g,ok){
     (ok?'':'<span>Answer: '+color(right)+'</span>')+(g.memo?'<small>'+g.memo+'</small>':'')+'</div></div>'+
     /* On a wide window the Next button sits here, under the verdict; on a phone it is the fixed bar at the bottom. */
     '<button class="btn nextin" data-act="next">'+nextLabel()+'</button>';
-  /* The chart or rule table is always open, right or wrong, so you see where your hand sits every time. */
-  var rt=ruleTable(g),openRef=true;
-  /* Why each wrong option loses sits straight under the main reason, with the one you picked first. */
+  /* Two parts, both always in full with nothing to tap open (the owner asked for this): the explanation (why, why
+     each wrong option loses with the one you picked first, and the principle), then the rules or the range. The
+     common mistake from E() is not shown: the why-not lines cover it. */
+  var rt=ruleTable(g);
   var wn=g.o.map(function(o,i){return {i:i,t:o.t,n:whyNot(g,i)};}).filter(function(x){return x.n;}).sort(function(a,b){return (b.i===picked)-(a.i===picked);});
-  var wnH=wn.length?'<div class="wn"><span>Why not the other'+(wn.length>1?'s':'')+'</span>'+wn.map(function(x){return '<p'+(x.i===picked?' class="mine"':'')+'><b>'+color(x.t)+'</b> '+color(x.n)+'</p>';}).join("")+'</div>':'';
-  if(!secs.length)h+=wnH;
-  secs.forEach(function(s,i){
-    h+=i===0?'<div class="why">'+color(s[1])+'</div>'+wnH:'<details class="more"'+(ok?'':' open')+'><summary>'+s[0]+CHEV+'</summary><div>'+color(s[1])+'</div></details>';
-  });
-  if(rt)h+='<details class="more"'+(openRef?' open':'')+'><summary>The rules'+CHEV+'</summary><div><p style="margin-bottom:8px">'+rt.t+':</p><div class="gtable">'+
-    rt.rows.map(function(r,i){return '<div'+(i===rt.hi?' class="me"':'')+'><span>'+r[0]+'</span><b>'+r[1]+'</b></div>';}).join("")+'</div></div></details>';
-  if(g.rkey)h+='<details class="more"'+(openRef?' open':'')+'><summary>The full range'+CHEV+'</summary><div>'+color(rangeText(g.rkey))+rangeGrid(g.rkey,g.rhl)+'</div></details>';
+  var prin="";secs.forEach(function(x){if(x[0]==="The principle")prin=x[1];});
+  if(secs.length)h+='<div class="why">'+color(secs[0][1])+'</div>';
+  if(wn.length)h+='<div class="wn">'+wn.map(function(x){return '<p'+(x.i===picked?' class="mine"':'')+'><b>'+color(x.t)+'</b> '+color(x.n)+'</p>';}).join("")+'</div>';
+  if(prin)h+='<p class="prin"><b>The principle.</b> '+color(prin)+'</p>';
+  if(rt)h+='<div class="ref"><span>The rules</span><p>'+rt.t+':</p><div class="gtable">'+
+    rt.rows.map(function(r,i){return '<div'+(i===rt.hi?' class="me"':'')+'><span>'+r[0]+'</span><b>'+r[1]+'</b></div>';}).join("")+'</div></div>';
+  if(g.rkey)h+='<div class="ref"><span>The full range</span>'+color(rangeText(g.rkey))+rangeGrid(g.rkey,g.rhl)+'</div>';
   return h;
 }
 function drillBar(){
