@@ -1540,6 +1540,24 @@ function ruleTable(g){
     ["Two pair or better","Raise"],["Top pair or overpair","Call"],["Second pair or weaker","Fold"]]};
   if(g.topic==="Facing bets"&&g.stage==="raise")return {t:"Raised after you bet the flop",hi:g.cat==="top"?0:g.monster?2:1,rows:[
     ["Top pair or overpair","Fold to a passive player. Call a player who bluff-raises"],["Two pair","Call a passive player. Call or re-raise a player who bluff-raises"],["A set or better","Call or re-raise"]]};
+  var sk=String(g.sk||"").split("|");
+  if(g.topic==="Facing limps"&&sk.length===3){
+    var kind=sk[1],two=sk[2]==="2",strong=["Strong: 77+, AT+, any suited ace, KQ, KJ, suited broadway","Raise to "+(two?"12-14":"8-10")+" ("+(two?"8-10 over one limper":"12-14 over two limpers")+")"];
+    var spec="Small pairs 22-66, suited connectors and one-gappers";
+    if(g.you==="BB")return {t:"Facing a limp in the big blind",hi:kind==="strong"?0:1,rows:[strong,["Everything else","Check. Never fold when checking is free"]]};
+    if(g.you==="SB")return {t:"Facing a limp in the small blind",hi:kind==="strong"?0:kind==="spec"?1:2,rows:[strong,[spec,"Call 1 more or fold: both are fine"],["Everything else","Fold"]]};
+    var rows=[strong];if(g.you==="BTN"&&!two)rows.push(["Two broadway cards, like KTo or QJo","Raise: only on the button over one limper"]);
+    rows.push([spec,"Call 2 and limp behind"],["Everything else","Fold"]);
+    return {t:"Facing a limp "+(g.you==="BTN"?"on the button":"with position on the limper"),hi:kind==="strong"?0:kind==="iso"?1:kind==="spec"?rows.length-2:rows.length-1,rows:rows};
+  }
+  if(g.topic==="Facing 3-bets"&&sk[0])return {t:"When they re-raise your open",hi:{prem:0,mid:1,speccheap:2,specdear:2,weak:3}[sk[0]],rows:[
+    ["QQ+, AK","4-bet or call"],["TT-JJ, AQ, AJs, KQs","Call"],["Small pairs, suited connectors","Call if it costs a tenth of your stack or less. Fold if it costs more"],["Everything else","Fold"]]};
+  if(g.topic==="Flop c-bets"&&sk.length>=2){
+    var mw=!!g.mw,thin=mw?"Check":"Bet small on a dry board. Check on a wet one";
+    return {t:"Betting the flop after you raised"+(mw?", against two callers":""),hi:{strong:0,top:1,medium2:2,medium:3,nothing:4}[sk[0]],rows:[
+      ["Two pair or better","Bet big on a wet board. Bet either size on a dry one"],["Top pair or overpair","Bet small on a dry board. Bet big on a wet one"],
+      ["Second pair",thin],["Weaker pair","Check"],["Nothing",thin]]};
+  }
   if(g.topic==="River vs big bets"&&g.kind)return {t:"Facing a river bet",hi:{top:0,two:1,set:2}[g.kind],rows:[
     ["Top pair or overpair","Fold to a solid player’s big bet. Call a bluffer or a small bet"],["Top two pair","Call a solid player. Call or raise the others"],["A set","Raise. Against a solid player, just call when a straight is possible"]]};
   return null;
@@ -1809,7 +1827,7 @@ function variant(topic,f,skill,avoid){
 /* Shown at the bottom of the page and the menu, so you can tell when a new release has loaded.
    v must match the cache name in sw.js (holdem-drill-X.Y.Z); the tests check it. Small fix: bump Z. New feature:
    bump Y. Big change: bump X. at is the release time in UTC, shown in the phone's own time zone. */
-var BUILD={v:"2.9.4",at:"2026-11-13T19:29Z"};
+var BUILD={v:"2.10.0",at:"2026-11-14T03:31Z"};
 function buildText(){
   var d=new Date(BUILD.at),t;
   try{t=d.toLocaleString("en-GB",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});}catch(e){t=BUILD.at;}

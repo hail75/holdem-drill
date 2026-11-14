@@ -250,7 +250,7 @@ const swv = readFileSync(new URL("../sw.js", import.meta.url), "utf8").match(/ho
 
 // Rule tables: the marked row names the play the spot grades as right
 { const first = t => t.split(/[ .]/)[0];
-  for (const topic of ["Facing bets", "River vs big bets"]) for (let i = 0; i < 4000; i++) { const g = X.G[topic].gen(null); if (!g) continue; g.topic = topic;
+  for (const topic of ["Facing bets", "River vs big bets", "Facing limps", "Facing 3-bets", "Flop c-bets"]) for (const f of X.G[topic].fmts || [null]) for (let i = 0; i < (X.G[topic].fmts ? 500 : 4000); i++) { const g = X.G[topic].gen(f); if (!g) continue; g.topic = topic;
     const rt = X.ruleTable(g); if (!rt || !(rt.hi >= 0 && rt.hi < rt.rows.length)) { ok(false, "rule table missing: " + topic + " " + g.sk); continue; }
     const row = rt.rows[rt.hi][1], right = g.o.filter(o => o.ok).map(o => first(o.t));
     for (const r of right) if (!new RegExp(r, "i").test(row)) ok(false, `rule table row "${row}" does not name ${r} (${g.sk})`);
